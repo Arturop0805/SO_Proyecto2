@@ -143,6 +143,50 @@ public class ListaEnlazada<T> {
         }
     }
     
+    
+   public Boolean eliminar(T dato){
+       if (this.EstaVacia()){
+           return false;
+       }
+       
+       if (this.tamaño == 1) {
+           this.inicio = null;
+           this.tamaño--;
+           return true;
+       }
+       
+       
+       
+       
+       Nodo<T> auxiliar = this.inicio;
+       auxiliar.setDato(dato);
+       while (auxiliar.getSiguiente() != null) {
+           if (auxiliar.getSiguiente().getDato() == dato) {
+               auxiliar.getSiguiente().setSiguiente(auxiliar.getSiguiente().getSiguiente());
+               System.out.println("se elimino: " + auxiliar.getSiguiente().getDato());
+               this.tamaño--;
+               
+           }
+           auxiliar = auxiliar.getSiguiente();
+       }
+       
+       
+      this.ActualizarIndices();
+      return true;
+   }
+    
+   
+   
+   public void buscar(T dato) {
+       Nodo<T> auxiliar = this.inicio;
+       auxiliar.setDato(dato);
+       while (auxiliar.getSiguiente() != null) {
+           if (auxiliar.getSiguiente().getDato() == dato) {
+               System.out.println("se encontro: "+ auxiliar.getSiguiente().getDato());
+           }
+           auxiliar = auxiliar.getSiguiente();
+       }
+   }
 }
 
     

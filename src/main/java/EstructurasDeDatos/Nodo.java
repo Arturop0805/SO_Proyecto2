@@ -17,7 +17,7 @@ public class Nodo<T> {
     
     public Nodo() {
 
-        this.dato = dato;
+        this.dato = null;
         this.siguiente = null;
         this.indice = indice;
 

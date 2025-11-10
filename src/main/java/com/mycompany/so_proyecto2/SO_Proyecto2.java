@@ -3,6 +3,7 @@
  */
 
 package com.mycompany.so_proyecto2;
+import EstructurasDeDatos.Cola;
 import EstructurasDeDatos.ListaEnlazada;
 /**
  *
@@ -13,6 +14,8 @@ public class SO_Proyecto2 {
     public static void main(String[] args) {
         
         
+       
+        Cola cola = new Cola();
         ListaEnlazada lista = new ListaEnlazada();
         
         lista.Insertar(1);
@@ -20,14 +23,10 @@ public class SO_Proyecto2 {
         lista.Insertar(5);
         lista.Insertar(7);
         lista.Insertar(9);
-        lista.Insertar(11);
-        lista.Insertar(13);
         
-        lista.InsertarPorIndice(4, "hola");
         
+      
         lista.print();
-        
-        
         
         
     }
