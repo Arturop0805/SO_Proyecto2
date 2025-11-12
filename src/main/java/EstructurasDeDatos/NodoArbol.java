@@ -47,8 +47,10 @@ public class NodoArbol<T> {
         this.hijos.Insertar(NuevoHijo);
     }
     
-    public void removerHijo(NodoArbol<T> Hijo) {
-        
+    public void removerHijo(T hijo) {
+        NodoArbol<T> Hijo = new NodoArbol<>();
+        Hijo.setDato(dato);
+        this.hijos.eliminar(Hijo);
     }
     
     

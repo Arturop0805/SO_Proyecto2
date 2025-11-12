@@ -11,7 +11,7 @@ package EstructurasDeDatos;
 public class Arbol<T> {
     
     private Nodo<T> raiz;
-    private int nivel;
+    
     
     
     

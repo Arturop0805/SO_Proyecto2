@@ -144,45 +144,50 @@ public class ListaEnlazada<T> {
     }
     
     
-   public Boolean eliminar(T dato){
-       if (this.EstaVacia()){
-           return false;
-       }
-       
-       if (this.tamaño == 1) {
-           this.inicio = null;
-           this.tamaño--;
-           return true;
-       }
-       
-       
-       
-       
-       Nodo<T> auxiliar = this.inicio;
-       auxiliar.setDato(dato);
-       while (auxiliar.getSiguiente() != null) {
-           if (auxiliar.getSiguiente().getDato() == dato) {
-               auxiliar.getSiguiente().setSiguiente(auxiliar.getSiguiente().getSiguiente());
-               System.out.println("se elimino: " + auxiliar.getSiguiente().getDato());
-               this.tamaño--;
-               
-           }
-           auxiliar = auxiliar.getSiguiente();
-       }
-       
-       
-      this.ActualizarIndices();
-      return true;
-   }
+   public boolean eliminar(T dato) {
+    if (this.EstaVacia()) {
+        System.out.println("esta vacia");
+        return false;
+    }
+    
+    // Caso especial: eliminar la cabeza
+    if (this.inicio.getDato().equals(dato)) {
+        this.inicio = this.inicio.getSiguiente();
+        System.out.println("eliminado: " + dato);
+        this.ActualizarIndices(); 
+        return true;
+    }
+    
+    Nodo<T> auxiliar = this.inicio;
+    
+    while (auxiliar.getSiguiente() != null) {
+        if (auxiliar.getSiguiente().getDato().equals(dato)) {
+            
+           
+            
+            auxiliar.setSiguiente(auxiliar.getSiguiente().getSiguiente());
+            System.out.println("eliminado: " + dato);
+            this.ActualizarIndices();  
+            return true;
+        } else {
+            auxiliar = auxiliar.getSiguiente();
+        }
+    }
+    
+    // Si no se encontró el elemento
+    System.out.println("elemento no encontrado");
+    return false;
+}
+
     
    
    
    public void buscar(T dato) {
        Nodo<T> auxiliar = this.inicio;
-       auxiliar.setDato(dato);
+       
        while (auxiliar.getSiguiente() != null) {
            if (auxiliar.getSiguiente().getDato() == dato) {
-               System.out.println("se encontro: "+ auxiliar.getSiguiente().getDato());
+               System.out.println("se encontro: "+ auxiliar.getSiguiente().getDato() + "indice: " + auxiliar.getSiguiente().getIndice());
            }
            auxiliar = auxiliar.getSiguiente();
        }

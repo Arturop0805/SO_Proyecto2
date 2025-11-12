@@ -16,7 +16,7 @@ public class SO_Proyecto2 {
         
        
         Cola cola = new Cola();
-        ListaEnlazada lista = new ListaEnlazada();
+        ListaEnlazada<Integer> lista = new ListaEnlazada();
         
         lista.Insertar(1);
         lista.Insertar(3);
@@ -25,7 +25,13 @@ public class SO_Proyecto2 {
         lista.Insertar(9);
         
         
-      
+        
+        
+        
+        lista.print();
+        
+        lista.eliminar(1);
+        
         lista.print();
         
         
