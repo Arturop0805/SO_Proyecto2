@@ -192,6 +192,20 @@ public class ListaEnlazada<T> {
            auxiliar = auxiliar.getSiguiente();
        }
    }
+   
+   public Nodo<T> buscarPorIndice(int indice) {
+       
+       Nodo auxiliar = this.inicio;
+       
+       while (auxiliar != null) {
+           if (auxiliar.getIndice() == indice){
+               return auxiliar;
+           }
+       }
+       
+       
+       return null;
+   }
 }
 
     
