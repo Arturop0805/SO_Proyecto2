@@ -17,10 +17,13 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class Archivo extends JFrame{
     
     private String nombre;
+    private boolean EsDirectorio;
+    private int size;
     
     
-    public Archivo (String nombre) {
+    public Archivo (String nombre,Boolean EsDirectorio) {
         this.nombre = nombre;
+        this.EsDirectorio = EsDirectorio;
     }
     
     public Archivo () {
@@ -35,4 +38,12 @@ public class Archivo extends JFrame{
         this.nombre = nombre;
     }
    
+    public void setEsDirectorio(boolean valor){
+        this.EsDirectorio = valor;
+    }
+    
+    public Boolean getEsDirectorio(){
+        return this.EsDirectorio;
+    }
+            
 }
