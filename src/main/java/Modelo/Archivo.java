@@ -21,9 +21,10 @@ public class Archivo extends JFrame{
     private int size;
     
     
-    public Archivo (String nombre,Boolean EsDirectorio) {
+    public Archivo (String nombre,Boolean EsDirectorio, int size) {
         this.nombre = nombre;
         this.EsDirectorio = EsDirectorio;
+        this.size = size;
     }
     
     public Archivo () {

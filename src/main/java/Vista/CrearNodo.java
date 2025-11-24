@@ -8,7 +8,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import Modelo.Archivo;
 import java.util.Enumeration;
-import Vista.Principal;
+
 /**
  *
  * @author Arturo
@@ -21,7 +21,7 @@ public class CrearNodo extends javax.swing.JFrame {
     
     public CrearNodo(DefaultTreeModel modeloArbol) {
         initComponents();
-        this.setSize(480, 360);
+        this.setSize(560, 360);
         this.setResizable(false);
         ListaPadres.removeAllItems();
         this.modelo = modeloArbol;
@@ -66,6 +66,8 @@ public class CrearNodo extends javax.swing.JFrame {
         CreateButton = new javax.swing.JButton();
         BackButton = new javax.swing.JButton();
         NameField = new javax.swing.JTextField();
+        SizeTextField = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -92,10 +94,8 @@ public class CrearNodo extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(SelectParent)
-                    .addComponent(ListaPadres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                .addComponent(ListaPadres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(SelectedField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -103,6 +103,10 @@ public class CrearNodo extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(21, 21, 21))))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(SelectParent)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -114,9 +118,10 @@ public class CrearNodo extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(SelectedField))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(SelectParent)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(35, 35, 35)
                         .addComponent(ListaPadres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(SelectParent)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -153,6 +158,8 @@ public class CrearNodo extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setText("Tamaño (Bloques)");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -160,20 +167,22 @@ public class CrearNodo extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(NameField, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(TypeChanger))
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addGap(0, 63, Short.MAX_VALUE)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(CreateButton)
                             .addComponent(Label))
                         .addGap(35, 35, 35)
-                        .addComponent(BackButton)))
+                        .addComponent(BackButton))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(NameField, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(TypeChanger)
+                            .addComponent(SizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -187,11 +196,15 @@ public class CrearNodo extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(NameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(SizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(TypeChanger)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 108, Short.MAX_VALUE)
+                .addGap(57, 57, 57)
                 .addComponent(CreateButton)
                 .addGap(21, 21, 21))
         );
@@ -246,15 +259,34 @@ public class CrearNodo extends javax.swing.JFrame {
 
     private void CreateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateButtonActionPerformed
         
+        
+        String TamañoTexto = SizeTextField.getText(); // Imagina que esto viene de tu JTextField
+        int TamañoNumero; 
+
+try {
+    TamañoNumero = Integer.parseInt(TamañoTexto.trim());
+  
+} catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+            "El valor ingresado no es un número válido. Por favor escribe solo dígitos.",
+            "Error de formato",
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+}
+
         boolean EsDirectorio;
+
         
         if (TypeChanger.getText().equals("Archivo")) {
             EsDirectorio = false;
         } else {
-            EsDirectorio = false;
+            EsDirectorio = true;
         }
         
-        Archivo archivo = new Archivo(NameField.getText(),EsDirectorio);
+        Archivo archivo = new Archivo(NameField.getText(),EsDirectorio,TamañoNumero);
+        
+        
+        
         
         DefaultMutableTreeNode NuevoNodo = new DefaultMutableTreeNode(archivo.getNombre(),EsDirectorio);
         DefaultMutableTreeNode Padre = buscarNodoPorNombre(SelectedField.getText());
@@ -266,8 +298,7 @@ public class CrearNodo extends javax.swing.JFrame {
 
     private void BackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackButtonActionPerformed
         this.dispose();
-        Principal interfaz = new Principal(modelo);
-        interfaz.setVisible(true);
+        
     }//GEN-LAST:event_BackButtonActionPerformed
 
     
@@ -300,7 +331,9 @@ public class CrearNodo extends javax.swing.JFrame {
     private javax.swing.JTextField NameField;
     private javax.swing.JButton SelectParent;
     private javax.swing.JLabel SelectedField;
+    private javax.swing.JTextField SizeTextField;
     private javax.swing.JButton TypeChanger;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

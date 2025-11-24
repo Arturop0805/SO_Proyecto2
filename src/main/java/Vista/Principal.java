@@ -182,8 +182,10 @@ public class Principal extends javax.swing.JFrame {
         etiquetaUser.setText(Gestor.getTipoUsuario());
         if (etiquetaUser.getText().equals("USER")){
             BotonAgregar.setVisible(false);
+            BotonEliminar.setVisible(false);
         } else {
             BotonAgregar.setVisible(true);
+            BotonEliminar.setVisible(true);
         }
     }//GEN-LAST:event_ChangeTypeButtonActionPerformed
 
