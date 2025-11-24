@@ -5,7 +5,7 @@
 package com.mycompany.so_proyecto2;
 import Modelo.Archivo;
 import javax.swing.JFrame;
-import Vista.VistaPrueba;
+import Vista.Principal;
 
 /**
  *
@@ -16,7 +16,7 @@ public class SO_Proyecto2 {
     public static void main(String[] args) {
         
         
-        VistaPrueba interfaz = new VistaPrueba();
+        Principal interfaz = new Principal();
         interfaz.setVisible(true);
         
         

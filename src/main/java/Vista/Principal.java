@@ -9,23 +9,25 @@ import javax.swing.tree.DefaultTreeModel;
 import Controlador.Simulador;
 import javax.swing.JOptionPane;
 import Vista.CrearNodo;
+import Vista.EliminarNodo;
 
 /**
  *
  * @author Arturo
  */
-public class VistaPrueba extends javax.swing.JFrame {
+public class Principal extends javax.swing.JFrame {
     
      Simulador Gestor = new Simulador();
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VistaPrueba.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Principal.class.getName());
 
     /**
      * Creates new form VistaPrueba
      */
-    public VistaPrueba() {
+    public Principal() {
         initComponents();
        
-      
+      this.setSize(420, 360);
+        this.setResizable(false);
        
        
        DefaultTreeModel modelo = new DefaultTreeModel(Gestor.crearArbolPrueba());
@@ -34,7 +36,7 @@ public class VistaPrueba extends javax.swing.JFrame {
        this.etiquetaUser.setText(Gestor.getTipoUsuario());
     }
     
-    public VistaPrueba(DefaultTreeModel modelo){
+    public Principal(DefaultTreeModel modelo){
         initComponents();
         
         Arbol.setModel(modelo);
@@ -61,6 +63,7 @@ public class VistaPrueba extends javax.swing.JFrame {
         etiquetaUser = new javax.swing.JLabel();
         BotonAgregar = new javax.swing.JButton();
         ChangeTypeButton = new javax.swing.JButton();
+        BotonEliminar = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -101,13 +104,20 @@ public class VistaPrueba extends javax.swing.JFrame {
             }
         });
 
+        BotonEliminar.setText("Eliminar");
+        BotonEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BotonEliminarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                         .addComponent(ChangeTypeButton)
@@ -115,6 +125,8 @@ public class VistaPrueba extends javax.swing.JFrame {
                         .addComponent(etiquetaUser, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addComponent(BotonEliminar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(BotonAgregar)
                         .addContainerGap())))
         );
@@ -129,7 +141,9 @@ public class VistaPrueba extends javax.swing.JFrame {
                     .addComponent(etiquetaUser, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ChangeTypeButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(BotonAgregar)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(BotonAgregar)
+                    .addComponent(BotonEliminar))
                 .addContainerGap())
         );
 
@@ -159,7 +173,7 @@ public class VistaPrueba extends javax.swing.JFrame {
         
        CrearNodo Interfaz = new CrearNodo(modelo);
        Interfaz.setVisible(true);
-       this.dispose();
+       
         
     }//GEN-LAST:event_BotonAgregarActionPerformed
 
@@ -173,12 +187,22 @@ public class VistaPrueba extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_ChangeTypeButtonActionPerformed
 
+    private void BotonEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonEliminarActionPerformed
+        
+        DefaultTreeModel modelo = (DefaultTreeModel) Arbol.getModel();
+        EliminarNodo interfaz = new EliminarNodo(modelo);
+        interfaz.setVisible(true);
+        
+        
+    }//GEN-LAST:event_BotonEliminarActionPerformed
+
     
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTree Arbol;
     private javax.swing.JButton BotonAgregar;
+    private javax.swing.JButton BotonEliminar;
     private javax.swing.JButton ChangeTypeButton;
     private javax.swing.JLabel etiquetaUser;
     private javax.swing.JMenu jMenu1;
