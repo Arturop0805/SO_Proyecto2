@@ -4,11 +4,8 @@
  */
 package Modelo;
 
-import java.awt.BorderLayout;
+import EstructurasDeDatos.ListaEnlazada;
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  *
@@ -19,13 +16,17 @@ public class Archivo extends JFrame{
     private String nombre;
     private boolean EsDirectorio;
     private int size;
+    public ListaEnlazada<Archivo> ListaHijos;
     
     
     public Archivo (String nombre,Boolean EsDirectorio, int size) {
         this.nombre = nombre;
         this.EsDirectorio = EsDirectorio;
         this.size = size;
+        this.ListaHijos = new ListaEnlazada<Archivo>();
     }
+    
+    
     
     public Archivo () {
         this.nombre = null;
@@ -47,4 +48,21 @@ public class Archivo extends JFrame{
         return this.EsDirectorio;
     }
             
+    public void agregarHijo(Archivo dato){
+        if (this.EsDirectorio == true){
+            this.ListaHijos.Insertar(dato);
+        } else {
+            System.out.println("NO ES DIRECTORIO");
+            return;
+        }
+        
+        
+    }
+    
+    
+    public void eliminarHijo(Archivo dato) {
+        this.ListaHijos.eliminar(dato);
+    }
 }
+
+

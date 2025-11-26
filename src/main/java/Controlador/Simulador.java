@@ -24,7 +24,7 @@ public class Simulador extends JFrame {
     
     public Simulador(){
         this.TipoUsuario = "ADMIN";
-        this.crearArbolPrueba();
+        
     }
     
     public DefaultMutableTreeNode crearArbolPrueba(){
@@ -61,6 +61,20 @@ public class Simulador extends JFrame {
       juego1.add(apkValorant);
       juego2.add(apkLoL);
        
+      
+      windows.agregarHijo(system32);
+      windows.agregarHijo(programUser);
+      programUser.agregarHijo(valorant);
+      programUser.agregarHijo(lol);
+      valorant.agregarHijo(data1);
+      valorant.agregarHijo(apk1);
+      lol.agregarHijo(data2);
+      lol.agregarHijo(apk2);
+    
+      
+     windows.eliminarHijo(system32);
+     windows.ListaHijos.print();
+      
        
         
         return raiz;
