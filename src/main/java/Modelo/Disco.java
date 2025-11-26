@@ -17,19 +17,24 @@ public class Disco {
     // Atributos
     private final int capacidadBloques;
     // CRÍTICO: Lista Enlazada para simular el almacenamiento físico (O(n) en acceso por ID)
-    private ListaEnlazada<Bloque> sdBlocks; 
+    private ListaEnlazada<Bloque> bloquesDeDisco; // 👈 Nomenclatura ajustada 
     private int bloquesLibres;
+    private ListaEnlazada<Archivo> listaArchivos; // 👈 Lista donde se registran los Archivos creados
     
-    // Constructor
+    /**
+     * Constructor
+     * @param totalBlocks Capacidad total del disco en bloques.
+     */
     public Disco(int totalBlocks) {
         this.capacidadBloques = totalBlocks; 
-        this.sdBlocks = new ListaEnlazada<>();
+        this.bloquesDeDisco = new ListaEnlazada<>(); // Inicialización de los bloques físicos
+        this.listaArchivos = new ListaEnlazada<>(); // 👈 CORRECCIÓN CRÍTICA: Inicialización de la lista de Archivos
         
         // Inicializa la lista enlazada con la cantidad total de Bloques
         for (int i = 0; i < this.capacidadBloques; i++) {
             // El índice 'i' se usa como el blockID (la dirección)
             Bloque nuevoBloque = new Bloque(i); 
-            this.sdBlocks.Insertar(nuevoBloque); 
+            this.bloquesDeDisco.Insertar(nuevoBloque); 
         }
         this.bloquesLibres = this.capacidadBloques;
     }
@@ -58,8 +63,7 @@ public class Disco {
         Nodo<Bloque> previousBlockNode = null; 
 
         // 1. Obtener el nodo inicial para comenzar el recorrido (O(n) por buscarPorIndice(0))
-        // Se asume que ListaEnlazada.buscarPorIndice(0) retorna el primer Nodo.
-        Nodo<Bloque> auxiliar = (Nodo<Bloque>) this.sdBlocks.buscarPorIndice(0); 
+        Nodo<Bloque> auxiliar = (Nodo<Bloque>) this.bloquesDeDisco.buscarPorIndice(0); // 👈 Uso de bloquesDeDisco
 
         // 2. Recorrer la ListaEnlazada una sola vez
         while (auxiliar != null && blocksToFind > 0) {
@@ -94,8 +98,8 @@ public class Disco {
             auxiliar = auxiliar.getSiguiente();
         }
 
-        // Esta sección solo se alcanza si la pre-verificación de bloques libres fue incorrecta.
-        // Se asume que no debería ocurrir si bloquesLibres se gestiona bien.
+        // Si se termina el bucle sin encontrar suficientes bloques (a pesar del chequeo inicial),
+        // algo va mal en el conteo de bloques libres.
         return -1; 
     }
 
@@ -109,7 +113,7 @@ public class Disco {
         while (currentBlockID != -1) {
             // 1. Se usa buscarPorIndice para "saltar" a la dirección del bloque
             // CRÍTICO: Esto hace que la liberación sea O(N * n_blocks) en el peor caso.
-            Nodo<Bloque> nodoActual = (Nodo<Bloque>) this.sdBlocks.buscarPorIndice(currentBlockID);
+            Nodo<Bloque> nodoActual = (Nodo<Bloque>) this.bloquesDeDisco.buscarPorIndice(currentBlockID); // 👈 Uso de bloquesDeDisco
 
             if (nodoActual == null) break; 
 
@@ -141,11 +145,19 @@ public class Disco {
     public Bloque getBlock(int blockID) {
         if (blockID >= 0 && blockID < capacidadBloques) {
             // CRÍTICO: Costo O(N) para acceder a un bloque específico.
-            Nodo<Bloque> nodo = (Nodo<Bloque>) this.sdBlocks.buscarPorIndice(blockID);
+            Nodo<Bloque> nodo = (Nodo<Bloque>) this.bloquesDeDisco.buscarPorIndice(blockID); // 👈 Uso de bloquesDeDisco
             if (nodo != null) {
                 return nodo.getDato();
             }
         }
         return null; 
+    }
+    
+    /**
+     * Retorna la lista de archivos que residen lógicamente en el disco.
+     * 👈 Este método soluciona el NullPointerException en la Vista.
+     */
+    public ListaEnlazada<Archivo> getListaArchivos() {
+        return listaArchivos;
     }
 }

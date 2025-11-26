@@ -8,6 +8,7 @@ import Controlador.Simulador;
 import EstructurasDeDatos.Nodo;
 import Modelo.Archivo;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -22,47 +23,51 @@ public class TablaArchivos extends javax.swing.JFrame {
      */
     public TablaArchivos(Simulador Gestor) {
         initComponents();
-        
-      
-       this.actualizarTablaArchivos(Gestor);
+        this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE); // Cambiado a DISPOSE_ON_CLOSE
+        this.actualizarTablaArchivos(Gestor);
     }
     
   public void actualizarTablaArchivos(Simulador Gestor) {
       
       
-    // 1. Obtener el modelo de tu JTable (asumiendo que la variable se llama jTableArchivos)
-    DefaultTableModel model = (DefaultTableModel) TablaArchivo.getModel();
-    
-    // 2. Definir las columnas si no lo has hecho en el diseñador visual
-    // Esto asegura que coincida con los requerimientos [cite: 60, 61, 62, 63]
-    model.setColumnIdentifiers(new Object[] {
-        "Nombre", 
-        "Cant. Bloques", 
-        "Directorio"
-    });
-
-    // 3. Limpiar la tabla actual (borrar filas viejas para evitar duplicados)
-    model.setRowCount(0);
-
-    // 4. Recorrer tu lista enlazada CUSTOM (Sin usar Iterator de Java)
-    // Asumimos que tienes acceso a 'miDisco' o 'gestorArchivos' que tiene la lista
-    Nodo<Archivo> actual = Gestor.SD.getListaArchivos().getHead();// Tu método para obtener el primer nodo
-
-    while (actual != null) {
-        Archivo arch = actual.getDato();
+    // 1. Obtener el modelo de tu JTable
+        DefaultTableModel model = (DefaultTableModel) TablaArchivo.getModel();
         
-        // Crear la fila con los datos
-        Object[] fila = new Object[] {
-            arch.getNombre(),
-            arch.getTamañoBloques(),
-            arch.getEsDirectorio(),
-        };
-        
-        // Agregar la fila al modelo
-        model.addRow(fila);
-        
-        // Mover al siguiente nodo
-        actual = actual.getSiguiente();
+        // 2. Definir las columnas de forma explícita, corrigiendo la última etiqueta
+        model.setColumnIdentifiers(new Object[] {
+            "Nombre", 
+            "Cant. Bloques", 
+            "¿Directorio?" 
+        });
+
+        // 3. Limpiar la tabla actual
+        model.setRowCount(0);
+
+        try {
+            // **Punto crítico:** Acceso a la lista. Asumiendo la estructura:
+            // Simulador -> Disco -> ListaEnlazada<Archivo>
+            Nodo<Archivo> actual = Gestor.getDiscoSimulado().getListaArchivos().getInicio(); 
+
+            while (actual != null) {
+                Archivo arch = actual.getDato();
+                
+                // Creamos la fila con los datos
+                Object[] fila = new Object[] {
+                    arch.getNombre(),
+                    arch.getTamañoBloques(),
+                    // Se muestra el ID del primer bloque como información de ubicación
+                    arch.getPrimerBloqueID() 
+                };
+                
+                // Agregar la fila al modelo
+                model.addRow(fila);
+                
+                // Mover al siguiente nodo
+                actual = actual.getSiguiente();
+            }
+        } catch (NullPointerException e) {
+            System.err.println("Error al acceder a la lista de archivos. Verifique el path: Gestor.getDiscoSimulado().getListaArchivos().getHead()");
+            JOptionPane.showMessageDialog(this, "Error: No se pudo cargar la lista de archivos del simulador.", "Error de Datos", JOptionPane.ERROR_MESSAGE);
     }
 }
 

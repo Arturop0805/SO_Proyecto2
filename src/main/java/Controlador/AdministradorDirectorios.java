@@ -5,18 +5,22 @@
 package Controlador;
 
 import Modelo.DirectorioEntrada;
-import EstructurasDeDatos.Nodo; 
+import EstructurasDeDatos.Nodo;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import Modelo.Disco; 
+import Modelo.Disco;
 import javax.swing.JOptionPane;
 
 
 public class AdministradorDirectorios {
 
-    private DirectorioEntrada raiz; 
+    private DirectorioEntrada raiz;
     private Disco disco; // Campo de instancia para el disco
     
+    // Constantes de Permisos (simplificadas para la simulación)
+    private static final String USUARIO_ROOT = "ROOT";
+    private static final String USUARIO_ADMIN = "ADMIN";
+    private static final String USUARIO_STANDARD = "USER";
     
     /**
      * Constructor para inicializar el Administrador, creando la raíz del sistema
@@ -26,7 +30,7 @@ public class AdministradorDirectorios {
         // Inicializa la raíz (que es un Directorio)
         // Directorio: numBloques=0, primerBloqueID=-1
         this.raiz = new DirectorioEntrada(nombreRaiz, true, 0, -1, propietario);
-        this.disco = disco; // ✅ CORRECCIÓN 1: Asigna la referencia del Disco
+        this.disco = disco; // Asigna la referencia del Disco
     }
     
     // --- Métodos de Interfaz (JTree) ---
@@ -53,8 +57,8 @@ public class AdministradorDirectorios {
         if (padreModelo.getEsDirectorio()) {
             
             // Iterar sobre tu ListaEnlazada<DirectorioEntrada>
-            // Usamos getInicio() de ListaEnlazada para comenzar el recorrido.
-            Nodo<DirectorioEntrada> auxiliar = (Nodo<DirectorioEntrada>) padreModelo.ListaHijos.getInicio(); 
+            // Se mantiene el casting asumiendo la estructura de ListaEnlazada
+            Nodo<DirectorioEntrada> auxiliar = (Nodo<DirectorioEntrada>) padreModelo.ListaHijos.getInicio();
             
             while (auxiliar != null) {
                 DirectorioEntrada hijoModelo = auxiliar.getDato();
@@ -71,7 +75,7 @@ public class AdministradorDirectorios {
                 }
                 
                 // Avanzar al siguiente elemento de la ListaEnlazada
-                auxiliar = auxiliar.getSiguiente(); 
+                auxiliar = auxiliar.getSiguiente();
             }
         }
     }
@@ -82,33 +86,33 @@ public class AdministradorDirectorios {
      * Crea un nuevo DirectorioEntrada (Archivo o Directorio), valida permisos,
      * asigna bloques en el Disco (si es archivo) y lo registra en la jerarquía.
      */
-    public DirectorioEntrada crearEntrada(String nombre, boolean esDirectorio, int tamañoBloques, DirectorioEntrada padre, String tipoUsuario) {
+    public DirectorioEntrada crearEntrada(String nombre, boolean esDirectorio, int tamañoBloques, DirectorioEntrada padre, String usuarioActual) {
         
         // --- 1. VALIDACIÓN DE PERMISOS ---
-        // Usar un nombre de usuario real en lugar de 'tipoUsuario' sería mejor
-        if (tipoUsuario.equalsIgnoreCase("USER")) {
+        // Asumiendo que solo ROOT/ADMIN pueden crear entradas
+        if (usuarioActual.equalsIgnoreCase(USUARIO_STANDARD)) {
             JOptionPane.showMessageDialog(null, "Permiso denegado: Los usuarios estándar no pueden crear entradas.", "Error de Permisos", JOptionPane.ERROR_MESSAGE);
             return null;
         }
 
         // --- 2. VALIDACIONES DE SISTEMA DE ARCHIVOS ---
         if (!padre.getEsDirectorio()) {
-             JOptionPane.showMessageDialog(null, "El padre seleccionado no es un directorio.", "Error", JOptionPane.ERROR_MESSAGE);
-             return null;
+            JOptionPane.showMessageDialog(null, "El padre seleccionado no es un directorio.", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
         }
         
-        // Verificar duplicados (O(n) - correcto para ListaEnlazada)
+        // Verificar duplicados
         Nodo<DirectorioEntrada> auxiliar = (Nodo<DirectorioEntrada>) padre.ListaHijos.getInicio();
         while (auxiliar != null) {
             DirectorioEntrada hijo = auxiliar.getDato();
             if (hijo.getNombre().equalsIgnoreCase(nombre)) {
-                 JOptionPane.showMessageDialog(null, "Ya existe una entrada con el nombre '" + nombre + "' en este directorio.", "Error", JOptionPane.ERROR_MESSAGE);
-                 return null;
+                JOptionPane.showMessageDialog(null, "Ya existe una entrada con el nombre '" + nombre + "' en este directorio.", "Error", JOptionPane.ERROR_MESSAGE);
+                return null;
             }
             auxiliar = auxiliar.getSiguiente();
         }
 
-        // 2c. Validar espacio en disco (solo para archivos)
+        // Validar espacio en disco (solo para archivos)
         if (!esDirectorio && !verificarEspacio(tamañoBloques)) {
             JOptionPane.showMessageDialog(null, "No hay suficiente espacio libre en el disco para este archivo.", "Error de Espacio", JOptionPane.ERROR_MESSAGE);
             return null;
@@ -117,18 +121,17 @@ public class AdministradorDirectorios {
         // --- 3. CREACIÓN Y REGISTRO ---
         
         final int PRIMER_BLOQUE_NULO = -1;
-        String propietario = tipoUsuario; // Usaremos el tipo de usuario como propietario temporal
-
+        
         // Crear la entrada inicialmente sin asignación de bloques
         DirectorioEntrada nuevaEntrada = new DirectorioEntrada(
-            nombre, 
-            esDirectorio, 
+            nombre,
+            esDirectorio,
             tamañoBloques, // numBloques
             PRIMER_BLOQUE_NULO, // -1 temporal
-            propietario
+            usuarioActual // Asignar el usuario actual como propietario
         );
         
-        // 💡 CORRECCIÓN 2: Asignación de bloques y actualización de la entrada
+        // Asignación de bloques y actualización de la entrada
         if (!esDirectorio) {
             // Asignar bloques y obtener el ID del primer bloque
             int firstBlockID = this.disco.allocateBlocks(tamañoBloques, nombre, 1); // Asumimos processID=1
@@ -139,24 +142,30 @@ public class AdministradorDirectorios {
                 return null;
             }
             
-            // ✅ CRÍTICO: Actualizar la entrada con el ID del primer bloque asignado
+            // CRÍTICO: Actualizar la entrada con el ID del primer bloque asignado
             nuevaEntrada.setPrimerBloqueID(firstBlockID);
         }
         
         // Registrar la entrada en la jerarquía del padre
-        padre.ListaHijos.Insertar(nuevaEntrada); 
+        padre.ListaHijos.Insertar(nuevaEntrada);
 
-        return nuevaEntrada; 
+        return nuevaEntrada;
     }
     
     /**
      * Elimina una entrada del directorio y libera sus bloques asociados en el disco.
      */
-    public boolean eliminarEntrada(DirectorioEntrada entrada, DirectorioEntrada padre) {
+    public boolean eliminarEntrada(DirectorioEntrada entrada, DirectorioEntrada padre, String usuario) {
         
         // 1. Validaciones
         if (entrada.getNombre().equals(this.raiz.getNombre())) {
             JOptionPane.showMessageDialog(null, "No se puede eliminar la raíz del sistema de archivos.", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        
+        // Verificar permisos de eliminación (solo el propietario o ROOT/ADMIN pueden eliminar)
+        if (!verificarPermisos(entrada, usuario, "DELETE")) {
+            JOptionPane.showMessageDialog(null, "Permiso denegado para eliminar la entrada: '" + entrada.getNombre() + "'.", "Error de Permisos", JOptionPane.ERROR_MESSAGE);
             return false;
         }
         
@@ -175,10 +184,35 @@ public class AdministradorDirectorios {
         // Se asume que ListaEnlazada.eliminar(T dato) funciona correctamente
         padre.ListaHijos.eliminar(entrada);
         
-        return true; 
+        return true;
     }
     
     // --- Métodos de Utilidad ---
+    
+    /**
+     * Verifica si el usuario tiene permiso para realizar una acción (lectura, escritura, eliminación)
+     * En esta simulación simplificada, solo verificamos la propiedad y roles especiales.
+     */
+    private boolean verificarPermisos(DirectorioEntrada entrada, String usuario, String accion) {
+        // ROOT o ADMIN siempre tienen todos los permisos
+        if (usuario.equalsIgnoreCase(USUARIO_ROOT) || usuario.equalsIgnoreCase(USUARIO_ADMIN)) {
+            return true;
+        }
+        
+        // El propietario siempre tiene permiso de eliminación y escritura/lectura
+        if (entrada.getPropietario().equalsIgnoreCase(usuario)) {
+            return true;
+        }
+        
+        // En esta simulación, solo el propietario o un superusuario puede eliminar/crear
+        if (accion.equals("DELETE")) {
+            return entrada.getPropietario().equalsIgnoreCase(usuario);
+        }
+        
+        // Para otras acciones (como lectura/escritura en archivos), se podría ampliar la lógica.
+        
+        return false;
+    }
     
     private boolean verificarEspacio(int bloquesRequeridos) {
         if (bloquesRequeridos <= 0) {

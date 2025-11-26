@@ -5,12 +5,12 @@
 package Vista;
 
 import Controlador.Simulador;
-import Modelo.Archivo;
+import Modelo.DirectorioEntrada;
 import java.util.Enumeration;
+import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import Controlador.AdministradorDirectorios;
-import Modelo.DirectorioEntrada;
 
 /**
  *
@@ -20,35 +20,48 @@ public class EliminarNodo extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(EliminarNodo.class.getName());
 
-   private AdministradorDirectorios adminFS;
-   private DefaultTreeModel modelo;
-<<<<<<< HEAD
+    private AdministradorDirectorios adminFS; // Acceso directo al FS para la lógica
+    private DefaultTreeModel modelo;
+    private Simulador gestor; // Acceso al contexto completo (incluido el usuario actual)
     
-    public EliminarNodo(DefaultTreeModel modeloArbol, AdministradorDirectorios adminFS) {
-=======
-   private Simulador gestor;
+    // Se consolida el constructor para recibir el Simulador (que contiene el contexto)
     public EliminarNodo(DefaultTreeModel modeloArbol, Simulador gestor) {
->>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
         initComponents();
         
         this.gestor = gestor;
+        // Obtenemos el AdministradorDirectorios del Simulador
+        this.adminFS = gestor.getAdminFS(); 
+        
         this.setSize(500, 200);
         this.setResizable(false);
         
-
         ListaNodos.removeAllItems();
         this.modelo = modeloArbol;
-        this.adminFS = adminFS;
+        
         DefaultMutableTreeNode raiz = (DefaultMutableTreeNode) modeloArbol.getRoot();
         this.cargarNodosRecursivo(raiz);
         
+        // Inicializar campo de selección
+        NodeNameField.setText("Seleccione un nodo a eliminar");
     }
     
+    /**
+     * Recorre el árbol recursivamente y añade todos los nodos al JComboBox,
+     * excluyendo el nodo raíz.
+     */
     private void cargarNodosRecursivo(DefaultMutableTreeNode nodo) {
         
+        Object userObject = nodo.getUserObject();
         
-        ListaNodos.addItem(nodo.toString());
-       
+        if (userObject instanceof DirectorioEntrada) {
+            DirectorioEntrada entrada = (DirectorioEntrada) userObject;
+            
+            // Excluimos el nodo raíz de la lista de elementos a eliminar
+            if (!entrada.getNombre().equals("/")) {
+                ListaNodos.addItem(entrada.getNombre());
+            }
+        }
+        
         // Si tiene hijos, recorremos los hijos también
         if (nodo.getChildCount() > 0) {
             for (int i = 0; i < nodo.getChildCount(); i++) {
@@ -57,6 +70,7 @@ public class EliminarNodo extends javax.swing.JFrame {
             }
         }
     }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -176,68 +190,84 @@ public class EliminarNodo extends javax.swing.JFrame {
     }//GEN-LAST:event_SelectButtonActionPerformed
 
     private void DeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteButtonActionPerformed
-        String nombreNodo = NodeNameField.getText();
-        Archivo archivoEliminado = this.gestor.SD.buscarPorNombre(nombreNodo);
-        
-        if (archivoEliminado == null) {
+        String nombreSeleccionado = NodeNameField.getText();
+
+        if (nombreSeleccionado.equals("Seleccione un nodo a eliminar") || nombreSeleccionado.equals("/")) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un archivo o directorio válido (no la raíz).", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-<<<<<<< HEAD
-        String nombreSeleccionado = NodeNameField.getText();
-    
+
         // 1. Buscar el nodo Swing (DefaultMutableTreeNode)
         DefaultMutableTreeNode nodoSwing = buscarNodoPorNombre(nombreSeleccionado);
 
-        if (nodoSwing == null) return; 
+        if (nodoSwing == null) {
+            JOptionPane.showMessageDialog(this, "Error interno: No se encontró el nodo seleccionado en el árbol.", "Error Interno", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         // 2. Obtener el objeto de datos del sistema de archivos (DirectorioEntrada)
-        DirectorioEntrada entradaAEliminar = (DirectorioEntrada) nodoSwing.getUserObject();
+        Object userObject = nodoSwing.getUserObject();
+        if (!(userObject instanceof DirectorioEntrada)) {
+            JOptionPane.showMessageDialog(this, "Error de modelo: El nodo seleccionado no es una entrada de directorio válida.", "Error de Modelo", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        DirectorioEntrada entradaAEliminar = (DirectorioEntrada) userObject;
 
-        // 3. Obtener el nodo padre (necesario para la eliminación en la ListaHijos)
+        // 3. Obtener el nodo padre (necesario para la eliminación en la ListaHijos del modelo)
         DefaultMutableTreeNode padreSwing = (DefaultMutableTreeNode) nodoSwing.getParent();
+        
+        if (padreSwing == null) {
+             JOptionPane.showMessageDialog(this, "No se puede eliminar la raíz.", "Error", JOptionPane.ERROR_MESSAGE);
+             return;
+        }
+        
+        // El objeto del padre debe ser DirectorioEntrada (salvo que sea la raíz, que ya se chequeó arriba)
         DirectorioEntrada padreEntrada = (DirectorioEntrada) padreSwing.getUserObject();
+        
+        // Obtenemos el usuario para la verificación de permisos en el controlador
+        // Se asume que getTipoUsuario() devuelve el nombre del usuario o un identificador de permisos.
+        String usuarioActual = gestor.getTipoUsuario();
 
-        // 4. DELEGAR la eliminación completa al Controlador
-        boolean exito = adminFS.eliminarEntrada(entradaAEliminar, padreEntrada);
+        // 4. DELEGAR la eliminación completa al Controlador (incluye liberación de bloques y verificación de permisos)
+        // Se asume que adminFS.eliminarEntrada(entrada, padre, usuario) devuelve true si tuvo éxito.
+        boolean exito = adminFS.eliminarEntrada(entradaAEliminar, padreEntrada, usuarioActual);
 
         if (exito) {
             // 5. Si el modelo de datos se eliminó, actualizar la vista
             modelo.removeNodeFromParent(nodoSwing);
+            modelo.reload(padreSwing);
+            
+            JOptionPane.showMessageDialog(this, "Entrada '" + nombreSeleccionado + "' eliminada con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
         } else {
-            // Manejo de errores (ej. permisos, directorio no vacío, etc.)
-            // JOptionPane.showMessageDialog(this, "Error al eliminar el nodo.", "Error", JOptionPane.ERROR_MESSAGE);
+            // Si retorna false, asumimos que el controlador maneja el mensaje de error específico
+            // (ej. "Permiso denegado", "Directorio no vacío", etc.)
+            // Si el controlador no maneja el mensaje, se debería añadir un JOptionPane aquí.
         }
-=======
-        DefaultMutableTreeNode NodoEliminado = buscarNodoPorNombre(nombreNodo);
-        
-        modelo.removeNodeFromParent(NodoEliminado);
-        this.gestor.SD.eliminarArch(archivoEliminado);
-        this.dispose();
->>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
-        
     }//GEN-LAST:event_DeleteButtonActionPerformed
 
     public DefaultMutableTreeNode buscarNodoPorNombre(String nombreBuscado) {
-    // 1. Obtener la raíz del árbol
     DefaultMutableTreeNode raiz = (DefaultMutableTreeNode) modelo.getRoot();
-    
-    // 2. Crear una enumeración para recorrer todo el árbol (Búsqueda en anchura)
-    Enumeration e = raiz.breadthFirstEnumeration();
-    
-    // 3. Recorrer todos los nodos
-    while (e.hasMoreElements()) {
-        DefaultMutableTreeNode nodo = (DefaultMutableTreeNode) e.nextElement();
+        // Usar Enumeration para recorrer todo el árbol (Búsqueda en anchura)
+        Enumeration e = raiz.breadthFirstEnumeration(); 
         
-        // 4. Comparar el texto del nodo con lo que buscamos
-        // Usamos equalsIgnoreCase para que no importen mayúsculas/minúsculas
-        if (nodo.getUserObject().toString().equals(nombreBuscado)) {
-            return nodo; // ¡Encontrado!
+        while (e.hasMoreElements()) {
+            DefaultMutableTreeNode nodo = (DefaultMutableTreeNode) e.nextElement();
+            Object userObject = nodo.getUserObject();
+
+            // 4. Comparar el nombre de la entrada de directorio/archivo
+            if (userObject instanceof DirectorioEntrada) {
+                 DirectorioEntrada entrada = (DirectorioEntrada) userObject;
+                 if (entrada.getNombre().equalsIgnoreCase(nombreBuscado)) {
+                     return nodo; // ¡Encontrado!
+                 }
+            } else if (userObject.toString().equalsIgnoreCase(nombreBuscado)) {
+                 // Caso de fallback si el userObject no es DirectorioEntrada, aunque debería serlo
+                 return nodo;
+            }
         }
-    }
-    
-    return null; // No se encontró nada
+        
+        return null; // No se encontró nada
 }
  
 

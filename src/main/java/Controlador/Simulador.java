@@ -6,8 +6,8 @@ package Controlador;
 
 import Modelo.Disco;
 import Utilidades.SimuladorSetup;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel; // Necesario para trabajar con el Root
+import javax.swing.tree.DefaultMutableTreeNode; 
+import javax.swing.tree.DefaultTreeModel; 
 
 /**
  * Controlador principal. Centraliza la inicialización y acceso al Sistema 
@@ -17,7 +17,11 @@ public class Simulador {
     
     private AdministradorDirectorios adminFS;
     private Disco discoSimulado;
-    private String TipoUsuario;
+    private String tipoUsuario;
+    
+    // Ciclo de usuarios simplificado (ADMIN y USER)
+    private static final String USUARIO_ADMIN = "ADMIN";
+    private static final String USUARIO_STANDARD = "USER";
     
     /**
      * Constructor que delega la inicialización del modelo a SimuladorSetup.
@@ -31,43 +35,42 @@ public class Simulador {
         
         // 2. Obtiene las instancias inicializadas
         this.discoSimulado = setup.getDiscoSimulado();
-        this.TipoUsuario = setup.getTipoUsuario();
+        this.tipoUsuario = setup.getTipoUsuario(); // Inicia como "ADMIN" o lo que defina el setup
     }
     
     /**
-     * Retorna el nodo raíz (DefaultMutableTreeNode) para que la Vista pueda 
-     * construir el DefaultTreeModel. Este método actúa como puente entre el Modelo 
-     * (DirectorioEntrada) y la Vista (JTree).
-     * @return El nodo raíz listo para ser usado en el JTree.
+     * Retorna el DefaultTreeModel completo para que la Vista (JTree) pueda 
+     * mostrar la jerarquía de archivos.
+     * @return El modelo de árbol listo para ser usado en el JTree.
      */
-    public DefaultMutableTreeNode crearArbolPrueba() {
-        // Obtenemos el DefaultTreeModel y luego su raíz, asumiendo que 
-        // AdministradorDirectorios tiene la lógica de conversión recursiva.
-        DefaultTreeModel model = this.adminFS.obtenerModeloArbol();
-        if (model != null && model.getRoot() instanceof DefaultMutableTreeNode) {
-            return (DefaultMutableTreeNode) model.getRoot();
-        }
-        return new DefaultMutableTreeNode("Error: Raíz no disponible");
+    public DefaultTreeModel crearArbolPrueba() {
+        // El AdministradorDirectorios ya contiene la lógica de conversión recursiva
+        // y devuelve el modelo de árbol completo.
+        return this.adminFS.obtenerModeloArbol();
     }
     
     // ----------------------------------------------------------------------
     // --- Gestión de Usuario ---
     // ----------------------------------------------------------------------
     
-    public void CambiarTipoUsuario(){
-        if (this.TipoUsuario.equals("ADMIN")) {
-            this.TipoUsuario = "USER";
+    /**
+     * Alterna el tipo de usuario entre ADMIN y USER.
+     * 👈 CORRECCIÓN: Método renombrado a camelCase.
+     */
+    public void cambiarTipoUsuario(){
+        if (this.tipoUsuario.equals(USUARIO_ADMIN)) {
+            this.tipoUsuario = USUARIO_STANDARD;
         } else {
-            this.TipoUsuario = "ADMIN";
+            this.tipoUsuario = USUARIO_ADMIN;
         }
     }
             
     public String getTipoUsuario() {
-        return this.TipoUsuario;
+        return this.tipoUsuario;
     }
     
     // ----------------------------------------------------------------------
-    // --- Acceso a Controladores/Modelos ---
+    // --- Acceso a Controladores/Modelos (Getters) ---
     // ----------------------------------------------------------------------
     
     public AdministradorDirectorios getAdminFS() {
@@ -77,4 +80,5 @@ public class Simulador {
     public Disco getDiscoSimulado() {
         return discoSimulado;
     }
+
 }

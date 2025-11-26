@@ -19,23 +19,28 @@ import Vista.ModificarNodo;
  */
 public class Principal extends javax.swing.JFrame {
     
-     Simulador Gestor = new Simulador(10);
+    Simulador Gestor = new Simulador(); 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Principal.class.getName());
 
     /**
-     * Creates new form VistaPrueba
+     * Creates new form Principal
      */
     public Principal() {
         initComponents();
-       
-      this.setSize(420, 360);
+        
+        this.setSize(420, 360);
         this.setResizable(false);
-       
-       
-       DefaultTreeModel modelo = new DefaultTreeModel(Gestor.crearArbolPrueba());
-       modelo.setAsksAllowsChildren(true);
-       Arbol.setModel(modelo);
-       this.etiquetaUser.setText(Gestor.getTipoUsuario());
+        
+        // 1. Obtener el modelo inicial del simulador (árbol de prueba)
+        // El método crearArbolPrueba() ahora devuelve directamente el DefaultTreeModel
+        DefaultTreeModel modelo = Gestor.crearArbolPrueba(); 
+        
+        // 2. Establecer el modelo en el JTree y configuración
+        modelo.setAsksAllowsChildren(true);
+        Arbol.setModel(modelo);
+        
+        // 3. Mostrar el usuario actual (inicialmente el que defina Simulador)
+        this.etiquetaUser.setText(Gestor.getTipoUsuario());
     }
     
     public Principal(DefaultTreeModel modelo){
@@ -194,25 +199,15 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void BotonAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonAgregarActionPerformed
-        
-        
-        
-        
-        
         DefaultTreeModel modelo = (DefaultTreeModel) Arbol.getModel();
         
-<<<<<<< HEAD
-       CrearNodo Interfaz = new CrearNodo(modelo, this.Gestor); // <-- Asegúrate de pasar 'this.Gestor'
-=======
-       CrearNodo Interfaz = new CrearNodo(modelo, Gestor);
->>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
-       Interfaz.setVisible(true);
-       
-        
+        // Se resuelve el conflicto de Git: se pasa la instancia del Gestor
+        CrearNodo Interfaz = new CrearNodo(modelo, this.Gestor); 
+        Interfaz.setVisible(true);
     }//GEN-LAST:event_BotonAgregarActionPerformed
 
     private void ChangeTypeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChangeTypeButtonActionPerformed
-      Gestor.CambiarTipoUsuario();
+      Gestor.cambiarTipoUsuario();
         etiquetaUser.setText(Gestor.getTipoUsuario());
         if (etiquetaUser.getText().equals("USER")){
             BotonAgregar.setVisible(false);
@@ -226,18 +221,15 @@ public class Principal extends javax.swing.JFrame {
     private void BotonEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonEliminarActionPerformed
         
         DefaultTreeModel modelo = (DefaultTreeModel) Arbol.getModel();
-<<<<<<< HEAD
+        // Se resuelve el conflicto de Git: se pasa la instancia del Gestor
         EliminarNodo interfaz = new EliminarNodo(modelo, this.Gestor);
-=======
-        EliminarNodo interfaz = new EliminarNodo(modelo, Gestor);
->>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
         interfaz.setVisible(true);
-        
-        
     }//GEN-LAST:event_BotonEliminarActionPerformed
 
     private void BotonModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonModificarActionPerformed
       DefaultTreeModel modelo = (DefaultTreeModel) Arbol.getModel();
+        // ModificarNodo solo recibe el modelo para actualizar, asumiendo que la lógica 
+        // de modificación real se realiza en ModificarNodo usando el Gestor.
         ModificarNodo interfaz = new ModificarNodo(modelo);
         interfaz.setVisible(true);
     }//GEN-LAST:event_BotonModificarActionPerformed
