@@ -21,6 +21,18 @@ public class ListaEnlazada<T> {
         this.tamano = 0;
     }
 
+    // ... (Métodos existentes: agregar, eliminar, obtener, eliminarPrimero, getTamano, getCabeza, estaVacia)
+
+    // --- NUEVO MÉTODO ---
+    /**
+     * Resetea la lista, dejando la cabeza nula y el tamaño en cero.
+     */
+    public void vaciar() {
+        this.cabeza = null;
+        this.tamano = 0;
+    }
+    // ----------------------
+
     /**
      * Añade un elemento al final de la lista.
      * @param dato El dato a añadir.
@@ -104,4 +116,4 @@ public class ListaEnlazada<T> {
     public boolean estaVacia() {
         return tamano == 0;
     }
-}    
+}

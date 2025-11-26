@@ -10,7 +10,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel; 
 import Modelo.EstructuraArchivo;
 import Modelo.Directorio;
-import EstructurasDeDatos.ListaEnlazada;
 import EstructurasDeDatos.Nodo;
 
 /**

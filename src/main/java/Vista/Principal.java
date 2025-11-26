@@ -13,7 +13,7 @@ import Vista.EliminarNodo;
 import Vista.ModificarNodo;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
-import Modelo.DirectorioEntrada;
+import Modelo.Directorio; 
 import Modelo.Archivo;
 
 
@@ -28,7 +28,7 @@ public class Principal extends javax.swing.JFrame implements TreeSelectionListen
 
     
     public Principal() {
-        initComponents();
+       initComponents();
         
         this.setSize(800, 600);
         this.setResizable(false);
@@ -72,7 +72,7 @@ public void refrescarArbol(Object entradaModeloSeleccionada) {
 
     // 2. Buscar la entrada de modelo en el nuevo árbol de Swing
     if (entradaModeloSeleccionada != null) {
-        
+
         // ¡CRÍTICO! Buscar el nodo de Swing que contiene este objeto de modelo
         DefaultMutableTreeNode nuevoNodo = encontrarNodoEnArbol(nuevoModelo, entradaModeloSeleccionada);
 
@@ -81,7 +81,7 @@ public void refrescarArbol(Object entradaModeloSeleccionada) {
             javax.swing.tree.TreePath path = new javax.swing.tree.TreePath(nuevoNodo.getPath());
             this.Arbol.setSelectionPath(path);
             this.Arbol.scrollPathToVisible(path);
-            
+
             // 4. Forzar la actualización del panel de detalles
             this.actualizarPanelInfo(entradaModeloSeleccionada);
         }
@@ -95,7 +95,7 @@ public void refrescarArbol(Object entradaModeloSeleccionada) {
 
         while (e.hasMoreElements()) {
             DefaultMutableTreeNode nodo = (DefaultMutableTreeNode) e.nextElement();
-            // Comparamos el objeto de modelo real (DirectorioEntrada/Archivo)
+            // Comparamos el objeto de modelo real (Directorio/Archivo)
             if (nodo.getUserObject().equals(userObjectBuscado)) {
                 return nodo;
             }
@@ -105,14 +105,15 @@ public void refrescarArbol(Object entradaModeloSeleccionada) {
 
         public void actualizarPanelInfo(Object objetoUsuario) {
             if (objetoUsuario == null) {
-                Nombre.setText("Nombre: (Ninguno)");
-                Tipo.setText("Tipo:");
-                Tamaño.setText("Tamaño:");
-                return;
-            }
+            Nombre.setText("Nombre: (Ninguno)");
+            Tipo.setText("Tipo:");
+            Tamaño.setText("Tamaño:");
+            return;
+        }
 
-            if (objetoUsuario instanceof DirectorioEntrada) {
-                DirectorioEntrada entrada = (DirectorioEntrada) objetoUsuario;
+            // CORRECCIÓN 2: Reemplazar DirectorioEntrada por Directorio
+            if (objetoUsuario instanceof Directorio) {
+                Directorio entrada = (Directorio) objetoUsuario;
                 Nombre.setText("Nombre: " + entrada.getNombre());
                 Tipo.setText("Tipo: Directorio");
                 // Se muestra 0 Bloques para directorios
@@ -122,8 +123,8 @@ public void refrescarArbol(Object entradaModeloSeleccionada) {
                 Archivo archivo = (Archivo) objetoUsuario;
                 Nombre.setText("Nombre: " + archivo.getNombre());
                 Tipo.setText("Tipo: Archivo");
-                // El tamaño se mide en bloques
-                Tamaño.setText("Tamaño: " + archivo.getTamañoBloques() + " Bloques");
+                // CORRECCIÓN 3: Usar getTamano() que retorna el tamaño en bloques
+                Tamaño.setText("Tamaño: " + archivo.getTamano() + " Bloques");
             } else {
                 // Manejar el nodo raíz o nodos sin objeto de modelo específico
                 Nombre.setText("Nombre: " + objetoUsuario.toString());
@@ -147,11 +148,12 @@ public void refrescarArbol(Object entradaModeloSeleccionada) {
             return;
         }
         
-        // El objeto de usuario contiene la instancia de nuestro modelo (DirectorioEntrada o Archivo)
+        // El objeto de usuario contiene la instancia de nuestro modelo (Directorio o Archivo)
         Object objetoUsuario = nodo.getUserObject();
         
-        if (objetoUsuario instanceof DirectorioEntrada) {
-            DirectorioEntrada entrada = (DirectorioEntrada) objetoUsuario;
+        // CORRECCIÓN 4: Reemplazar DirectorioEntrada por Directorio
+        if (objetoUsuario instanceof Directorio) {
+            Directorio entrada = (Directorio) objetoUsuario;
             Nombre.setText("Nombre: " + entrada.getNombre());
             Tipo.setText("Tipo: Directorio");
             // Se muestra 0 Bloques para directorios
@@ -161,8 +163,8 @@ public void refrescarArbol(Object entradaModeloSeleccionada) {
             Archivo archivo = (Archivo) objetoUsuario;
             Nombre.setText("Nombre: " + archivo.getNombre());
             Tipo.setText("Tipo: Archivo");
-            // El tamaño se mide en bloques
-            Tamaño.setText("Tamaño: " + archivo.getTamañoBloques() + " Bloques");
+            // CORRECCIÓN 5: Usar getTamano() que retorna el tamaño en bloques
+            Tamaño.setText("Tamaño: " + archivo.getTamano() + " Bloques");
         } else {
             // Manejar el nodo raíz o nodos sin objeto de modelo específico
             Nombre.setText("Nombre: " + objetoUsuario.toString());

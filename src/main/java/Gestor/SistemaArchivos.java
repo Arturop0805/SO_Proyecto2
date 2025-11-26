@@ -9,7 +9,7 @@ import Modelo.Directorio;
 import Modelo.EstructuraArchivo;
 import Controlador.Proceso;
 import Controlador.Proceso.Operacion;
-import EstructurasDeDatos.ListaEnlazada; // Requerido si Directorio usa ListaEnlazada
+import EstructurasDeDatos.ListaEnlazada; 
 
 /**
  * Clase principal que gestiona la estructura jerárquica y coordina las operaciones.
@@ -27,16 +27,16 @@ public class SistemaArchivos {
 
     public SistemaArchivos() {
         final String PROPIETARIO_ROOT = ModoUsuario.ADMINISTRADOR.toString();
-        this.raiz = new Directorio("/", PROPIETARIO_ROOT); // Usamos "/" como nombre de la raíz
+        this.raiz = new Directorio("/", PROPIETARIO_ROOT); 
         
         this.disco = new DiscoSimulado();
-        // ASUNCIÓN: Se debe inicializar PlanificadorDisco (pendiente de su definición)
-        this.planificador = new PlanificadorDisco(); 
+        this.planificador = new PlanificadorDisco();    
         this.modoActual = ModoUsuario.ADMINISTRADOR;    
     }
     
     /**
      * Implementa la búsqueda jerárquica de una entrada de archivo o directorio.
+     * REEMPLAZA EL USO DE split() por indexOf() y substring().
      * @param ruta Ruta completa de la entrada (ej: /windows/system32)
      * @return EstructuraArchivo si se encuentra, null si no.
      */
@@ -45,31 +45,46 @@ public class SistemaArchivos {
             return raiz;
         }
 
-        // 1. Normalizar y dividir la ruta (eliminar barra inicial si existe)
+        // 1. Normalizar la ruta (eliminar barra inicial si existe)
         String rutaLimpia = ruta.trim();
         if (rutaLimpia.startsWith("/")) {
             rutaLimpia = rutaLimpia.substring(1);
         }
         
-        String[] partes = rutaLimpia.split("/");
         Directorio actual = raiz;
         EstructuraArchivo resultado = null;
+        String pathRestante = rutaLimpia;
         
-        // 2. Recorrer el árbol
-        for (int i = 0; i < partes.length; i++) {
-            String nombreParte = partes[i];
+        // 2. Recorrer el árbol usando métodos de String básicos
+        while (pathRestante.length() > 0) {
+            int separadorIndex = pathRestante.indexOf('/');
+            String nombreParte;
+
+            if (separadorIndex == 0) {
+                // Caso de barra doble (e.g., //path) o componente vacío, ignorar y avanzar
+                pathRestante = pathRestante.substring(1);
+                continue;
+            } else if (separadorIndex == -1) {
+                // Último componente de la ruta
+                nombreParte = pathRestante;
+                pathRestante = ""; // Marcamos como vacío para terminar el bucle
+            } else {
+                // Componente intermedio
+                nombreParte = pathRestante.substring(0, separadorIndex);
+                pathRestante = pathRestante.substring(separadorIndex + 1);
+            }
             
             if (actual == null) return null;
-            
-            // Asumimos que Directorio.buscarContenido(String nombre) encuentra un hijo directo por nombre.
+
+            // Buscar el componente actual en el directorio 'actual'
             resultado = actual.buscarContenido(nombreParte); 
             
             if (resultado == null) {
                 return null; // Componente no encontrado
             }
             
-            if (i < partes.length - 1) {
-                // Si no es el último componente, debe ser un directorio para seguir la ruta
+            // Si AÚN queda ruta restante, el 'resultado' debe ser un directorio para continuar
+            if (pathRestante.length() > 0) {
                 if (resultado.esDirectorio()) {
                     actual = (Directorio) resultado;
                 } else {
@@ -80,8 +95,54 @@ public class SistemaArchivos {
         return resultado;
     }
     
-    // Resto de métodos de la clase...
-    // ...
+    /**
+     * Verifica si la operación está permitida en el modo actual.
+     * @param operacion Operación solicitada.
+     * @return true si es permitida, false si está restringida.
+     */
+    public boolean tienePermiso(Operacion operacion) {
+        if (modoActual == ModoUsuario.ADMINISTRADOR) {
+            return true; 
+        } else {
+            // Usuario restringido a solo lectura (LEER)
+            return operacion == Operacion.LEER;
+        }
+    }
+    
+    // --- Operaciones de Alto Nivel (CRUD) ---
+    
+    /**
+     * Envía una solicitud de E/S para ser procesada por el planificador.
+     */
+    public void enviarSolicitud(Proceso proceso) {
+        if (proceso.getOperacion() != Operacion.LEER && !tienePermiso(proceso.getOperacion())) {
+            System.out.println("Permiso denegado para la operación " + proceso.getOperacion());
+            proceso.setEstado(Proceso.Estado.TERMINADO); 
+            return;
+        }
+        
+        planificador.agregarSolicitud(proceso);
+    }
+    
+    /**
+     * Ejecuta una operación CRUD que ya fue planificada.
+     */
+    public boolean ejecutarOperacion(Proceso proceso) {
+        proceso.setEstado(Proceso.Estado.EJECUTANDO);    
+
+        switch (proceso.getOperacion()) {
+            case CREAR:
+                return ejecutarCrear(proceso);
+            case ELIMINAR:
+                return ejecutarEliminar(proceso);
+            case ACTUALIZAR:
+                return ejecutarActualizar(proceso);    
+            case LEER:
+                return ejecutarLeer(proceso);    
+            default:
+                return false;
+        }
+    }
 
     private boolean ejecutarCrear(Proceso proceso) {
         if (!tienePermiso(proceso.getOperacion())) return false;    
@@ -90,10 +151,9 @@ public class SistemaArchivos {
         
         // 1. Parsear la ruta para obtener el padre y el nombre de la entrada
         int lastSeparator = rutaCompleta.lastIndexOf('/');
-        String nombreEntrada = (lastSeparator == -1) 
+        String nombreEntrada = (lastSeparator == -1)    
                                ? rutaCompleta : rutaCompleta.substring(lastSeparator + 1);
-        // Si no hay separador o la ruta es solo "/", el padre es la raíz.
-        String rutaPadre = (lastSeparator <= 0) 
+        String rutaPadre = (lastSeparator <= 0)    
                            ? "/" : rutaCompleta.substring(0, lastSeparator);
 
         if (nombreEntrada.isEmpty()) {
@@ -102,9 +162,10 @@ public class SistemaArchivos {
             return false;
         }
         
-        // 2. Encontrar el directorio padre usando la nueva lógica de búsqueda
+        // 2. Encontrar el directorio padre usando la lógica de búsqueda corregida
         EstructuraArchivo estructuraPadre = buscarRuta(rutaPadre);
         
+        // CORRECCIÓN: Se reemplaza 'estructuraPadra' por 'estructuraPadre'
         if (estructuraPadre == null || !estructuraPadre.esDirectorio()) {
             System.out.println("ERROR: Directorio padre '" + rutaPadre + "' no encontrado o no es un directorio.");
             proceso.setEstado(Proceso.Estado.TERMINADO);
@@ -119,12 +180,14 @@ public class SistemaArchivos {
             return false;
         }
 
-        // 4. Crear el archivo (manteniendo la asunción de constructor)
+        // 4. Crear el archivo
         Archivo nuevoArchivo = new Archivo(
             nombreEntrada, // Nombre de archivo extraído
             proceso.getTamanoSolicitado(),    
             proceso.getId(),    
-            "Azul"
+            // Asumimos que el constructor de Archivo requiere el propietario, 
+            // y que el propietario es el del proceso que lo crea.
+            String.valueOf(proceso.getId()) // Se usa el ID del proceso como propietario temporal
         );
 
         if (disco.asignarBloques(nuevoArchivo)) {
@@ -147,9 +210,9 @@ public class SistemaArchivos {
 
         // 1. Parsear la ruta para obtener el padre y el nombre de la entrada
         int lastSeparator = rutaCompleta.lastIndexOf('/');
-        String nombreEntrada = (lastSeparator == -1) 
+        String nombreEntrada = (lastSeparator == -1)    
                                ? rutaCompleta : rutaCompleta.substring(lastSeparator + 1);
-        String rutaPadre = (lastSeparator <= 0) 
+        String rutaPadre = (lastSeparator <= 0)    
                            ? "/" : rutaCompleta.substring(0, lastSeparator);
 
         if (nombreEntrada.isEmpty()) return false;
@@ -187,16 +250,32 @@ public class SistemaArchivos {
         proceso.setEstado(Proceso.Estado.TERMINADO);
         return eliminado;
     }
-    
-    // Se mantienen los métodos ejecutarActualizar y ejecutarLeer, ya que usan la nueva lógica de buscarRuta
-    // ...
-    
-    // Métodos de utilidad que se mantienen (se omiten por brevedad)
-    public boolean tienePermiso(Operacion operacion) { /* ... */ return true; }
-    public void enviarSolicitud(Proceso proceso) { /* ... */ }
-    public boolean ejecutarOperacion(Proceso proceso) { /* ... */ return true; }
 
-    // Getters y Setters de Estado que se mantienen (se omiten por brevedad)
+    private boolean ejecutarActualizar(Proceso proceso) {
+        if (!tienePermiso(proceso.getOperacion())) return false;    
+        
+        EstructuraArchivo estructura = buscarRuta(proceso.getRutaArchivo());
+        if (estructura != null) {
+            estructura.setNombre(proceso.getRutaArchivo() + "_UPDATED");    
+            proceso.setEstado(Proceso.Estado.TERMINADO);
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean ejecutarLeer(Proceso proceso) {
+        EstructuraArchivo estructura = buscarRuta(proceso.getRutaArchivo());
+        if (estructura != null) {
+            System.out.println("Leyendo/Visualizando: " + estructura.getNombre() +    
+                                 ", Tamaño: " + estructura.getTamano() + " bloques.");
+            proceso.setEstado(Proceso.Estado.TERMINADO);
+            return true;
+        }
+        return false;
+    }
+    
+    // --- Getters y Setters de Estado ---
+
     public Directorio getRaiz() { return raiz; }
     public DiscoSimulado getDisco() { return disco; }
     public PlanificadorDisco getPlanificador() { return planificador; }
