@@ -5,61 +5,42 @@
 package Modelo;
 
 /**
- * Representa un Bloque de Disco en un Sistema de Archivos con Asignación Encadenada.
- * CRÍTICO: El punteroSiguiente implementa la lista enlazada a nivel de disco.
+ * Representa un bloque de almacenamiento en el Disco Simulado.
  */
 public class Bloque {
-    
-    private final int blockID;
-    private int punteroSiguiente;
-    private boolean isOccupied;
-    private String fileName;
-    private int processOwnerID;
-    
-    public Bloque(int id) {
-        this.blockID = id;
-        this.isOccupied = false;
-        this.punteroSiguiente = -1; // -1 indica que no apunta a otro bloque (FIN)
-        this.fileName = null;
-        this.processOwnerID = -1;
+    private boolean ocupado;
+    private String contenido; // Simplificación del contenido
+    private int indiceSiguienteBloque; // Implementación de Asignación Encadenada [cite: 32]
+    private int idPropietario; // Proceso o archivo que lo ocupa [cite: 21]
+
+    public Bloque() {
+        this.ocupado = false;
+        this.contenido = "";
+        this.indiceSiguienteBloque = -1; // -1 indica el final de la cadena o libre
+        this.idPropietario = -1;
     }
-    
-    // --- Métodos de Operación ---
-    
-    /**
-     * Marca el bloque como ocupado y asigna propietarios. 
-     * NOTA: El punteroSiguiente se establece externamente en la clase Disco.
-     */
-    public void occupy(String fileName, int processID) { // <--- CORRECCIÓN: 2 argumentos
-        this.isOccupied = true;
-        this.fileName = fileName;
-        this.processOwnerID = processID;
-        // Se mantiene el puntero existente hasta que Disco lo establezca
+
+    // --- Métodos de gestión ---
+
+    public void ocupar(int idPropietario) {
+        this.ocupado = true;
+        this.idPropietario = idPropietario;
     }
 
     public void liberar() {
-        this.fileName = null;
-        this.processOwnerID = -1;
-        this.isOccupied = false;
-        this.punteroSiguiente = -1;
+        this.ocupado = false;
+        this.contenido = "";
+        this.indiceSiguienteBloque = -1;
+        this.idPropietario = -1;
     }
-    
+
     // --- Getters y Setters ---
-    public int getBlockID() { return blockID; }
-    public boolean isOccupied() { return isOccupied; }
-    public int getPunteroSiguiente() { return punteroSiguiente; }
-    public String getFileName() { return fileName; }
-    public int getProcessOwnerID() { return processOwnerID; }
 
-    public void setPunteroSiguiente(int punteroSiguiente) {
-        this.punteroSiguiente = punteroSiguiente;
+    public boolean isOcupado() { return ocupado; }
+    public void setIndiceSiguienteBloque(int indiceSiguienteBloque) {
+        this.indiceSiguienteBloque = indiceSiguienteBloque;
     }
-
-    @Override
-    public String toString() {
-        String estado = isOccupied ? (fileName != null ? fileName : "OCUPADO") : "LIBRE";
-        String puntero = punteroSiguiente == -1 ? "FIN" : String.format("%02d", punteroSiguiente);
-        
-        return String.format("[ID:%02d | %-8s | Puntero:%s]", blockID, estado, puntero);
-    }
+    public int getIndiceSiguienteBloque() { return indiceSiguienteBloque; }
+    public int getIdPropietario() { return idPropietario; }
+    // ... otros getters/setters si son necesarios
 }

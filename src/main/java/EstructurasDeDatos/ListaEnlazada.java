@@ -7,24 +7,25 @@ package EstructurasDeDatos;
 import javax.swing.JOptionPane;
 
 
-
 /**
- * Implementación básica de una Lista Enlazada genérica.
- * CRÍTICO: El método buscarPorIndice() es crucial para simular el acceso indexado al disco.
+ * Implementación básica de una Lista Enlazada genérica para evitar el uso de librerías prohibidas (ArrayList, Queue).
  * @param <T> Tipo de dato almacenado.
  */
 public class ListaEnlazada<T> {
     
     private Nodo<T> cabeza;
-    private int tamaño;
+    private int tamano;
 
     public ListaEnlazada() {
         this.cabeza = null;
-        this.tamaño = 0;
+        this.tamano = 0;
     }
-    
-    /** Inserta un nuevo nodo al final de la lista. */
-    public void Insertar(T dato) {
+
+    /**
+     * Añade un elemento al final de la lista.
+     * @param dato El dato a añadir.
+     */
+    public void agregar(T dato) {
         Nodo<T> nuevoNodo = new Nodo<>(dato);
         if (cabeza == null) {
             cabeza = nuevoNodo;
@@ -35,46 +36,72 @@ public class ListaEnlazada<T> {
             }
             actual.setSiguiente(nuevoNodo);
         }
-        tamaño++;
+        tamano++;
     }
 
-    /** Elimina un dato específico de la lista. */
-    public void eliminar(T dato) {
-        if (cabeza == null) return;
-
+    /**
+     * Elimina el primer elemento que coincide con el dato.
+     * @param dato El dato a eliminar.
+     * @return true si se eliminó, false si no se encontró.
+     */
+    public boolean eliminar(T dato) {
+        if (cabeza == null) return false;
+        
         if (cabeza.getDato().equals(dato)) {
             cabeza = cabeza.getSiguiente();
-            tamaño--;
-            return;
+            tamano--;
+            return true;
         }
 
         Nodo<T> actual = cabeza;
         while (actual.getSiguiente() != null) {
             if (actual.getSiguiente().getDato().equals(dato)) {
                 actual.setSiguiente(actual.getSiguiente().getSiguiente());
-                tamaño--;
-                return;
+                tamano--;
+                return true;
             }
             actual = actual.getSiguiente();
         }
+        return false;
     }
-    
-    public int getTamaño() {
-        return tamaño;
-    }
-    
+
     /**
-     * Busca un Nodo específico por su índice (O(N)).
-     * Usado en el Disco para simular el acceso a un bloque por su ID (dirección).
+     * Obtiene el dato en una posición específica.
+     * @param indice La posición (0-basada).
+     * @return El dato en la posición o null si el índice es inválido.
      */
-    public Nodo<T> buscarPorIndice(int indice) {
-        if (indice < 0 || indice >= tamaño) {
-            return null;
-        }
+    public T obtener(int indice) {
+        if (indice < 0 || indice >= tamano) return null;
+        
         Nodo<T> actual = cabeza;
         for (int i = 0; i < indice; i++) {
             actual = actual.getSiguiente();
         }
-        return actual;
+        return actual.getDato();
+    }
+
+    /**
+     * Elimina y devuelve el primer elemento (útil para simular una Queue/FIFO).
+     * @return El primer dato o null si la lista está vacía.
+     */
+    public T eliminarPrimero() {
+        if (cabeza == null) return null;
+        
+        T dato = cabeza.getDato();
+        cabeza = cabeza.getSiguiente();
+        tamano--;
+        return dato;
+    }
+
+    public int getTamano() {
+        return tamano;
+    }
+    
+    public Nodo<T> getCabeza() {
+        return cabeza;
+    }
+    
+    public boolean estaVacia() {
+        return tamano == 0;
     }
 }    

@@ -5,9 +5,8 @@
 package Utilidades;
 
 import Controlador.AdministradorDirectorios;
-import Controlador.AdministradorDirectorios;
-import Modelo.Disco;
-import Modelo.DirectorioEntrada;
+import Gestor.DiscoSimulado; // Clase correcta para la simulación del disco
+import Modelo.Directorio; // Se usa Directorio para la raíz y los subdirectorios
 
 /**
  * Encargada de la configuración inicial del Disco y la estructura de archivos.
@@ -15,92 +14,74 @@ import Modelo.DirectorioEntrada;
  */
 public class SimuladorSetup {
     
-    // Constantes de configuración
-    private static final int CAPACIDAD_DISCO = 100; // Capacidad total en bloques
-    private static final int ID_PROCESO_SETUP = 99; // ID de proceso usado para inicializar
+    // El tamaño del disco se lee ahora de DiscoSimulado.CAPACIDAD_MAXIMA
+    // private static final int CAPACIDAD_DISCO = 100; // Se elimina, se lee del DiscoSimulado
     
-    private Disco discoSimulado;
+    // No necesitamos ID_PROCESO_SETUP, ya que crearEntrada usa el Propietario/Usuario
+    // private static final int ID_PROCESO_SETUP = 99; 
+    
+    private DiscoSimulado discoSimulado;
     private AdministradorDirectorios adminFS;
-    private String TipoUsuario; // Podría usarse para simular la sesión inicial
+    private String TipoUsuario;
     
     
     public SimuladorSetup(){
-        // 1. Inicializa el Modelo (Disco)
-        this.discoSimulado = new Disco(CAPACIDAD_DISCO);
+        // 1. Inicializa el Gestor (DiscoSimulado)
+        this.discoSimulado = new DiscoSimulado(); // DiscoSimulado ya inicializa su tamaño internamente
         
         // 2. Inicializa el Controlador (AdminFS) e inyecta la dependencia del Disco.
-        // ✅ CORRECCIÓN CRÍTICA: Se pasa el discoSimulado al constructor del AdminFS.
-        this.adminFS = new AdministradorDirectorios("/", "root", this.discoSimulado); 
+        this.adminFS = new AdministradorDirectorios("/", "ROOT", this.discoSimulado); 
         
         this.TipoUsuario = "ADMIN";
-        System.out.println("Disco inicializado con " + CAPACIDAD_DISCO + " bloques.");
+        System.out.println("Disco inicializado con " + discoSimulado.getCapacidadMaxima() + " bloques.");
     }
     
     /**
      * Crea la estructura jerárquica de prueba y asigna bloques reales en el disco
-     * usando el método de Asignación Encadenada.
+     * usando el método de Asignación Encadenada, a través del controlador.
      * @return El AdministradorDirectorios configurado.
      */
     public AdministradorDirectorios setupSistemaArchivosPrueba() {
-        DirectorioEntrada raiz = adminFS.getRaiz();
+        
+        // La raíz es de tipo Directorio
+        Directorio raiz = adminFS.getRaiz();
 
         // --- Nivel 1 ---
-        DirectorioEntrada windows = crearDirectorio("windows", "root", raiz);
-        DirectorioEntrada programUser = crearDirectorio("ProgramUser", "root", raiz);
+        // Usamos adminFS.crearEntrada para delegar la lógica de creación. 
+        // El resultado debe ser casteado a Directorio para usarlo como padre.
+        Directorio windows = (Directorio) adminFS.crearEntrada("windows", true, 0, raiz, "ROOT");
+        Directorio programUser = (Directorio) adminFS.crearEntrada("ProgramUser", true, 0, raiz, "ROOT");
 
         // --- Nivel 2 ---
-        crearDirectorio("system32", "root", windows);
-        DirectorioEntrada valorant = crearDirectorio("valorant", "userA", programUser);
-        DirectorioEntrada lol = crearDirectorio("League of Legends", "userB", programUser);
+        adminFS.crearEntrada("system32", true, 0, windows, "ROOT");
+        Directorio valorant = (Directorio) adminFS.crearEntrada("valorant", true, 0, programUser, "USERA");
+        Directorio lol = (Directorio) adminFS.crearEntrada("League of Legends", true, 0, programUser, "USERB");
 
         // --- Nivel 3: Archivos con Asignación de Bloques ---
         
+        // El tamañoBloques se pasa en crearEntrada, y el controlador gestiona la asignación.
         // Total bloques a usar: 8 + 21 + 13 + 34 = 76 bloques.
-        crearArchivo("obb.val", 8, "userA", valorant);
-        crearArchivo("apk.val", 21, "userA", valorant);
-        crearArchivo("obb.lol", 13, "userB", lol);
-        crearArchivo("apk.lol", 34, "userB", lol);
+        adminFS.crearEntrada("obb.val", false, 8, valorant, "USERA");
+        adminFS.crearEntrada("apk.val", false, 21, valorant, "USERA");
+        adminFS.crearEntrada("obb.lol", false, 13, lol, "USERB");
+        adminFS.crearEntrada("apk.lol", false, 34, lol, "USERB");
         
+        // Los métodos auxiliares crearDirectorio y crearArchivo ya no son necesarios.
+
         System.out.println("--- Setup Completado ---");
-        System.out.println("Capacidad Total: " + CAPACIDAD_DISCO + " bloques.");
-        System.out.println("Bloques Usados en Setup: " + (CAPACIDAD_DISCO - discoSimulado.getBloquesLibres()) + " bloques.");
-        System.out.println("Bloques Libres Restantes: " + discoSimulado.getBloquesLibres() + " bloques.");
+        System.out.println("Capacidad Total: " + discoSimulado.getCapacidadMaxima() + " bloques.");
+        
+        int bloquesUsados = discoSimulado.getCapacidadMaxima() - discoSimulado.getBloquesLibresCount();
+        System.out.println("Bloques Usados en Setup: " + bloquesUsados + " bloques.");
+        
+        System.out.println("Bloques Libres Restantes: " + discoSimulado.getBloquesLibresCount() + " bloques.");
         
         return adminFS;
-    }
-    
-    // --- Métodos Auxiliares ---
-    
-    /**
-     * Crea una nueva entrada de directorio. Los directorios no consumen bloques de datos.
-     */
-    private DirectorioEntrada crearDirectorio(String nombre, String propietario, DirectorioEntrada padre) {
-        // Directorio: numBloques = 0, primerBloqueID = -1 (no asignado)
-        DirectorioEntrada nuevoDir = new DirectorioEntrada(nombre, true, 0, -1, propietario);
-        // La jerarquía se construye llamando al método agregarHijo de DirectorioEntrada
-        padre.agregarHijo(nuevoDir); 
-        return nuevoDir;
-    }
-
-    /**
-     * Intenta asignar bloques en el disco y, si tiene éxito, crea la entrada de archivo.
-     */
-    private void crearArchivo(String nombre, int bloques, String propietario, DirectorioEntrada padre) {
-        // 1. Asignar bloques en el Disco (Lógica Encadenada)
-        int primerID = discoSimulado.allocateBlocks(bloques, nombre, ID_PROCESO_SETUP);
-        
-        if (primerID != -1) {
-            // 2. Crear la entrada de directorio/archivo con el ID del primer bloque
-            DirectorioEntrada nuevoArchivo = new DirectorioEntrada(nombre, false, bloques, primerID, propietario);
-            padre.agregarHijo(nuevoArchivo);
-        } else {
-            System.err.println("ERROR CRÍTICO: No se pudo crear el archivo " + nombre + " de " + bloques + " bloques. Disco lleno o espacio fragmentado.");
-        }
     }
     
     // --- Getters ---
     
     public AdministradorDirectorios getAdminFS() { return adminFS; }
-    public Disco getDiscoSimulado() { return discoSimulado; }
+    public DiscoSimulado getDiscoSimulado() { return discoSimulado; }
     public String getTipoUsuario() { return TipoUsuario; }
 }

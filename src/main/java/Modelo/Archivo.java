@@ -4,71 +4,67 @@
  */
 package Modelo;
 
-
-
 import EstructurasDeDatos.ListaEnlazada;
 
 /**
- * Representa un Archivo o Directorio dentro del simulador del Sistema de Archivos.
+ * Representa un Archivo en el sistema. Almacena el inicio de su cadena de bloques.
  */
-public class Archivo {
+public class Archivo extends EstructuraArchivo {
     
-    private final String nombre; 
-    private final boolean esDirectorio;
-    private int sizeInBlocks;
-    private int primerBloqueID;
-    private boolean enDisco; 
-    private String propietario = "default"; // Añadido para consistencia con Bloque
-    
-    private final ListaEnlazada<Archivo> listaHijos;
+    private int tamanoEnBloques;
+    private int primerBloque; // Dirección del primer bloque [cite: 62]
+    private int procesoCreadorID; // Proceso que lo creó [cite: 21]
+    private String color; // Color asociado para la JTable [cite: 63]
 
-    // --- CONSTRUCTORES ---
-    public Archivo (String nombre, boolean esDirectorio, int sizeInBlocks, String propietario) {
-        this.nombre = nombre;
-        this.esDirectorio = esDirectorio;
-        this.sizeInBlocks = sizeInBlocks;
-        this.propietario = propietario;
-        
-        this.primerBloqueID = -1;
-        this.enDisco = false;
-        this.listaHijos = new ListaEnlazada<>();
+    // Los bloques se gestionan en DiscoSimulado, pero guardamos la lista de índices para la asignación encadenada
+    private ListaEnlazada<Integer> indicesBloques; 
+
+    public Archivo(String nombre, int tamanoEnBloques, int procesoCreadorID, String propietario) {
+        // ASUMIENDO QUE "color" se sustituye por "propietario" para que el controlador funcione:
+        super(nombre, false, propietario);
+        this.tamanoEnBloques = tamanoEnBloques;
+        this.procesoCreadorID = procesoCreadorID;
+        this.color = color;
+        this.primerBloque = -1; // Inicialmente no asignado
+        this.indicesBloques = new ListaEnlazada<>();
     }
     
-    // Constructor de Directorio Raíz o Default
-    public Archivo (String nombre, boolean esDirectorio, String propietario) {
-        this(nombre, esDirectorio, 0, propietario);
-    }
+    // --- Gestión de Bloques ---
     
-    // --- MÉTODOS DE MANEJO DE ESTRUCTURA Y PROPIEDADES ---
-    public void agregarHijo(Archivo dato){
-        if (this.esDirectorio) {
-            this.listaHijos.Insertar(dato);
-        } else {
-            // Error handling
+    /**
+     * Asigna un bloque al archivo. Se usa durante la creación.
+     * @param indiceBloque El índice del bloque en el DiscoSimulado.
+     */
+    public void agregarBloque(int indiceBloque) {
+        if (this.primerBloque == -1) {
+            this.primerBloque = indiceBloque;
         }
+        this.indicesBloques.agregar(indiceBloque);
     }
     
-    public void eliminarHijo(Archivo dato) {
-        this.listaHijos.eliminar(dato);
-    }
+    // --- Getters y Setters ---
 
     @Override
-    public String toString() {
-        return this.nombre + (this.esDirectorio ? "/" : "");
-    }
+    public int getTamano() { return tamanoEnBloques; } // Tamaño en bloques [cite: 61]
+    public int getPrimerBloque() { return primerBloque; }
+    public int getProcesoCreadorID() { return procesoCreadorID; }
+    public String getColor() { return color; }
+    public ListaEnlazada<Integer> getIndicesBloques() { return indicesBloques; }
 
-    // --- GETTERS Y SETTERS ---
-    public String getNombre() { return this.nombre; }
-    public boolean esDirectorio() { return this.esDirectorio; }
-    public int getPrimerBloqueID() { return primerBloqueID; }
-    public void setPrimerBloqueID(int primerBloqueID) {
-        this.primerBloqueID = primerBloqueID;
-        this.enDisco = (primerBloqueID != -1);
+    public void setTamanoEnBloques(int tamanoEnBloques) {
+        this.tamanoEnBloques = tamanoEnBloques;
     }
-    public int getSizeInBlocks() { return this.sizeInBlocks; }
-    public void setSizeInBlocks(int sizeInBlocks) { this.sizeInBlocks = sizeInBlocks; }
-    public boolean estaEnDisco() { return this.enDisco; }
-    public void setEnDisco(boolean valor) { this.enDisco = valor; }
-    public String getPropietario() { return propietario; }
-    public ListaEnlazada<Archivo> getListaHijos() { return listaHijos; }
+    
+    public void setPrimerBloque(int primerBloque) {
+        this.primerBloque = primerBloque;
+    }
+    
+    // Necesario para el controlador (aunque debería ser parte de EstructuraArchivo)
+    public int getPrimerBloqueID() { return primerBloque; } 
+    // Aunque el Archivo tiene getPrimerBloque(), si mantienes la convención de DiscoSimulado, 
+    // debes asegurarte de que este método exista. Si no puedes agregarlo, el controlador 
+    // debe usar getPrimerBloque() en su lugar (como se hizo en el código corregido).
+
+    // NECESARIO para el controlador (fue omitido en tu snippet):
+    public void setProcesoCreadorID(int id) { this.procesoCreadorID = id; }
 }

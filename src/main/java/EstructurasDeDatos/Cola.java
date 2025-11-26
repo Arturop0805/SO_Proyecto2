@@ -4,101 +4,98 @@
  */
 package EstructurasDeDatos;
 
-import EstructurasDeDatos.Nodo; // Asegúrate de que esta línea esté presente
-
 /**
- * Representa una estructura de datos Cola (Queue) implementada
- * usando una Lista Enlazada para un rendimiento O(1) en encolar y desencolar.
+ * Implementación básica de una Cola (Queue/FIFO) usando una lista enlazada,
+ * asegurando la correcta tipificación genérica.
+ * @param <T> Tipo de dato almacenado.
  */
 public class Cola<T> {
     
-    private Nodo<T> cabeza; // Puntero al inicio (para desencolar)
-    private Nodo<T> cola;   // Puntero al final (para encolar)
-    private int tamaño;
-    
-    public Cola(){
+    private Nodo<T> cabeza; // Frente (head)
+    private Nodo<T> cola; // Final (tail)
+    private int tamano;
+
+    public Cola() {
         this.cabeza = null;
         this.cola = null;
-        this.tamaño = 0;
+        this.tamano = 0;
     }
-            
-    public boolean EstaVacia() {
-        // Mejorado para simplicidad
-        return this.cabeza == null;
-    }
-    
-    public int getTamaño() {
-        return this.tamaño; 
-    }
-    
+
     /**
-     * Añade un elemento al final de la cola (O(1)).
-     * @param dato El elemento a añadir.
+     * Añade un elemento al final de la cola (Enqueue).
+     * @param dato El dato a añadir.
      */
-    public void encolar(T dato) {
-        // Usamos el constructor de Nodo con el dato (y el índice, si es necesario)
-        Nodo<T> NuevoNodo = new Nodo<>(dato, this.tamaño); 
+    public void agregar(T dato) {
+        // Corrección de error de inferencia de tipo: Nodo<T> nuevoNodo = new Nodo<>(dato);
+        Nodo<T> nuevoNodo = new Nodo<T>(dato); 
         
-        if (this.EstaVacia()) {
-            this.cabeza = NuevoNodo;
-            this.cola = NuevoNodo;
-            
+        if (cola == null) {
+            cabeza = nuevoNodo;
+            cola = nuevoNodo;
         } else {
-            // El nodo actual al final apunta al nuevo nodo
-            this.cola.setSiguiente(NuevoNodo);
-            // El nuevo nodo es la nueva cola
-            this.cola = NuevoNodo; 
-        }  
-        
-        this.tamaño++;
-        // ✅ ELIMINADO: this.ActualizarIndices() para mantener rendimiento O(1)
+            cola.setSiguiente(nuevoNodo);
+            cola = nuevoNodo;
+        }
+        tamano++;
     }
-    
+
     /**
-     * Elimina y retorna el elemento al inicio de la cola (O(1)).
-     * @return El dato al inicio de la cola o null si está vacía.
+     * Elimina y devuelve el primer elemento (Dequeue/FIFO).
+     * @return El primer dato o null si la cola está vacía.
      */
-    public T desencolar() {
-        if (this.EstaVacia()) {
+    public T eliminarPrimero() {
+        if (cabeza == null) {
             return null;
-        } 
-        
-        T datoExtraido = this.cabeza.getDato();
-        
-        if (this.tamaño == 1){
-            this.cabeza = null;
-            this.cola = null; // ✅ CORRECCIÓN
-            
-        } else {
-            this.cabeza = this.cabeza.getSiguiente();
         }
         
-        this.tamaño--;
-        // ✅ ELIMINADO: this.ActualizarIndices() para mantener rendimiento O(1)
+        T dato = cabeza.getDato();
+        cabeza = cabeza.getSiguiente();
         
-        return datoExtraido;
+        if (cabeza == null) {
+            cola = null; // La cola queda vacía
+        }
+        tamano--;
+        return dato;
+    }
+
+    public int getTamano() {
+        return tamano;
     }
     
-    // Si aún se necesita, el método ActualizarIndices() debe corregirse
-    /*
-    public void ActualizarIndices(){
-        Nodo auxiliar = this.cabeza;
-        int contador = 0;
-        while (auxiliar != null) { // Bucle corregido para evitar NPE
-            auxiliar.setIndice(contador);
-            auxiliar = auxiliar.getSiguiente();
-            contador++;
-        }
+    public Nodo<T> getCabeza() {
+        return cabeza;
     }
-    */
     
-    public void print() {
-        Nodo<T> auxiliar = this.cabeza;
+    public boolean estaVacia() {
+        return tamano == 0;
+    }
+    
+    /**
+     * Elimina el elemento del inicio si es el mismo que el proporcionado (útil para Planificador).
+     * @param dato El dato a buscar y eliminar.
+     * @return true si se eliminó, false si no se encontró.
+     */
+    public boolean eliminar(T dato) {
+        if (cabeza == null) return false;
         
-        while (auxiliar != null) {
-            // Se asume que el índice ya está correcto por el diseño de Nodo y encolar
-            System.out.println(auxiliar.getDato() + "----- idx: " + auxiliar.getIndice());
-            auxiliar = auxiliar.getSiguiente();
+        if (cabeza.getDato().equals(dato)) {
+            eliminarPrimero();
+            return true;
         }
+
+        Nodo<T> actual = cabeza;
+        while (actual.getSiguiente() != null) {
+            if (actual.getSiguiente().getDato().equals(dato)) {
+                actual.setSiguiente(actual.getSiguiente().getSiguiente());
+                tamano--;
+                // Si eliminamos el último nodo, actualizamos la 'cola'
+                if (actual.getSiguiente() == null) { 
+                    cola = actual;
+                }
+                return true;
+            }
+            actual = actual.getSiguiente();
+        }
+        return false;
     }
 }

@@ -2,40 +2,46 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Modelo;
+package Controlador;
 
 /**
- *
- * @author yange
+ * Representa un proceso de usuario con una solicitud de E/S.
  */
-// En Modelo/Proceso.java
 public class Proceso {
-    private int pid; // Process ID
-    private String nombre;
-    private int tiempoLlegada;
-    private int tiempoRafaga; // Tiempo que necesita la CPU
-    private EstadoProceso estado; // EN_ESPERA, EN_EJECUCION, TERMINADO, etc.
-    // ... otros atributos (prioridad, memoria requerida, etc.)
+    
+    public enum Estado {
+        NUEVO, LISTO, EJECUTANDO, BLOQUEADO, TERMINADO
+    }
+    
+    public enum Operacion {
+        CREAR, LEER, ACTUALIZAR, ELIMINAR
+    }
+    
+    private static int CONTADOR_ID = 1;
+    private final int id;
+    private Estado estado;
+    private Operacion operacion;
+    private String rutaArchivo; // Archivo sobre el que opera
+    private int tamanoSolicitado; // Solo relevante para CREAR
+    private int posicionCilindro; // Posición de la solicitud en el disco, para Planificación
 
-    public enum EstadoProceso {
-    NUEVO, EN_ESPERA, EN_EJECUCION, BLOQUEADO, TERMINADO
+    public Proceso(Operacion operacion, String rutaArchivo, int tamanoSolicitado) {
+        this.id = CONTADOR_ID++;
+        this.estado = Estado.NUEVO; // [cite: 17]
+        this.operacion = operacion; // [cite: 17]
+        this.rutaArchivo = rutaArchivo;
+        this.tamanoSolicitado = tamanoSolicitado;
+        this.posicionCilindro = (int) (Math.random() * 100); // Asumimos disco de 100 cilindros/bloques para simulación
     }
-    
-    public Proceso(int pid, String nombre, int rafaga) {
-        this.pid = pid;
-        this.nombre = nombre;
-        this.tiempoRafaga = rafaga;
-        this.estado = EstadoProceso.NUEVO; // O EN_ESPERA
-    }
-    
-    // Getters y Setters
-    public int getPid() { return pid; }
-    public String getNombre() { return nombre; }
-    public EstadoProceso getEstado() { return estado; }
-    public void setEstado(EstadoProceso estado) { this.estado = estado; }
-    // ...
+
+    // --- Getters y Setters ---
+
+    public int getId() { return id; }
+    public Estado getEstado() { return estado; }
+    public void setEstado(Estado estado) { this.estado = estado; }
+    public Operacion getOperacion() { return operacion; }
+    public String getRutaArchivo() { return rutaArchivo; }
+    public int getTamanoSolicitado() { return tamanoSolicitado; }
+    public int getPosicionCilindro() { return posicionCilindro; }
 }
-
-// Enumeración de estados (Opción)
-
 
