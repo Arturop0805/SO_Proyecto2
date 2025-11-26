@@ -209,10 +209,10 @@ public class ModificarNodo extends javax.swing.JFrame {
         
     DefaultMutableTreeNode NodoModificado = buscarNodoPorNombre(this.NodoModificado);
     
+    
+    
     NodoModificado.setUserObject(NuevoNombre);
-        
-        
-        modelo.nodeChanged(NodoModificado);
+    modelo.nodeChanged(NodoModificado);
         this.dispose();
         
     }//GEN-LAST:event_BotonGuardarActionPerformed

@@ -17,19 +17,30 @@ public class Archivo extends JFrame{
     private boolean EsDirectorio;
     private int size;
     public ListaEnlazada<Archivo> ListaHijos;
+    public ListaEnlazada<Bloque> ListaBloquesAsignados;
+    public Boolean enDisco;
     
     
     public Archivo (String nombre,Boolean EsDirectorio, int size) {
         this.nombre = nombre;
         this.EsDirectorio = EsDirectorio;
         this.size = size;
-        this.ListaHijos = new ListaEnlazada<Archivo>();
+        this.ListaHijos = new ListaEnlazada();
+        this.enDisco = false;
     }
     
     
     
     public Archivo () {
         this.nombre = null;
+    }
+    
+    public Boolean EstaEnDisco(){
+        return this.enDisco;
+    }
+    
+    public void setEnDisco(Boolean valor) {
+        this.enDisco = valor;
     }
     
     public String getNombre() {
@@ -62,6 +73,10 @@ public class Archivo extends JFrame{
     
     public void eliminarHijo(Archivo dato) {
         this.ListaHijos.eliminar(dato);
+    }
+    
+    public int getTamañoBloques() {
+        return this.size;
     }
 }
 
