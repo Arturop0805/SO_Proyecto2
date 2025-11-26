@@ -4,6 +4,7 @@
  */
 package Vista;
 
+import Controlador.Simulador;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import Modelo.Archivo;
@@ -18,9 +19,11 @@ public class CrearNodo extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CrearNodo.class.getName());
 
     private DefaultTreeModel modelo;
+    private Simulador Gestor;
     
-    public CrearNodo(DefaultTreeModel modeloArbol) {
+    public CrearNodo(DefaultTreeModel modeloArbol, Simulador Gestor) {
         initComponents();
+        this.Gestor = Gestor;
         this.setSize(560, 360);
         this.setResizable(false);
         ListaPadres.removeAllItems();
@@ -157,6 +160,11 @@ public class CrearNodo extends javax.swing.JFrame {
                 NameFieldActionPerformed(evt);
             }
         });
+        NameField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                NameFieldKeyTyped(evt);
+            }
+        });
 
         jLabel1.setText("Tamaño (Bloques)");
 
@@ -263,6 +271,10 @@ public class CrearNodo extends javax.swing.JFrame {
         String TamañoTexto = SizeTextField.getText(); // Imagina que esto viene de tu JTextField
         int TamañoNumero; 
 
+        Archivo auxiliar = this.Gestor.SD.buscarPorNombre(NameField.getText());
+         if (auxiliar != null)  {
+             return;
+         } 
 try {
     TamañoNumero = Integer.parseInt(TamañoTexto.trim());
   
@@ -293,13 +305,30 @@ try {
         int indice = Padre.getChildCount();
         modelo.insertNodeInto(NuevoNodo, Padre, indice);
         
-        
+        Gestor.SD.insertarArch(archivo);
+        this.dispose();
     }//GEN-LAST:event_CreateButtonActionPerformed
 
     private void BackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackButtonActionPerformed
         this.dispose();
         
     }//GEN-LAST:event_BackButtonActionPerformed
+
+    private void NameFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_NameFieldKeyTyped
+             // 1. Obtenemos el carácter que el usuario acaba de teclear
+    char c = evt.getKeyChar();
+
+    // 2. Verificamos si NO es una letra Y tampoco es un espacio
+    // (Añade más condiciones si necesitas permitir algo más)
+    if (!Character.isLetter(c) && c != ' ') {
+        
+        // 3. "Consumimos" el evento para que no se procese (no se escribe)
+        evt.consume();
+        
+        // Opcional: Emitir un pitido para avisar al usuario
+        java.awt.Toolkit.getDefaultToolkit().beep();
+    }
+    }//GEN-LAST:event_NameFieldKeyTyped
 
     
     public DefaultMutableTreeNode buscarNodoPorNombre(String nombreBuscado) {

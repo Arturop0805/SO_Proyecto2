@@ -5,10 +5,13 @@ Vista\CrearNodo$3.class
 Vista\ModificarNodo$4.class
 Vista\EliminarNodo$3.class
 Modelo\Archivo.class
+Modelo\Bloque.class
 Vista\CrearNodo$1.class
 Vista\ModificarNodo$6.class
 Vista\Principal$2.class
+Vista\Principal$5.class
 Vista\Principal.class
+Vista\TablaArchivos$1.class
 Vista\CrearNodo.class
 Vista\EliminarNodo$1.class
 com\mycompany\so_proyecto2\SO_Proyecto2.class
@@ -20,10 +23,13 @@ Controlador\Simulador.class
 Vista\CrearNodo$2.class
 Vista\EliminarNodo.class
 Vista\ModificarNodo$1.class
+Vista\CrearNodo$6.class
 Vista\ModificarNodo.class
+Vista\TablaArchivos.class
 Vista\Principal$3.class
 Vista\ModificarNodo$5.class
 Vista\CrearNodo$5.class
 Vista\ModificarNodo$7.class
+Modelo\Disco.class
 EstructurasDeDatos\Nodo.class
 Vista\Principal$1.class

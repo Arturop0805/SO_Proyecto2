@@ -4,6 +4,8 @@
  */
 package Vista;
 
+import Controlador.Simulador;
+import Modelo.Archivo;
 import java.util.Enumeration;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -17,9 +19,11 @@ public class EliminarNodo extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(EliminarNodo.class.getName());
 
    private DefaultTreeModel modelo;
-    
-    public EliminarNodo(DefaultTreeModel modeloArbol) {
+   private Simulador gestor;
+    public EliminarNodo(DefaultTreeModel modeloArbol, Simulador gestor) {
         initComponents();
+        
+        this.gestor = gestor;
         this.setSize(500, 200);
         this.setResizable(false);
         
@@ -163,11 +167,17 @@ public class EliminarNodo extends javax.swing.JFrame {
     }//GEN-LAST:event_SelectButtonActionPerformed
 
     private void DeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteButtonActionPerformed
+        String nombreNodo = NodeNameField.getText();
+        Archivo archivoEliminado = this.gestor.SD.buscarPorNombre(nombreNodo);
         
+        if (archivoEliminado == null) {
+            return;
+        }
         
-        DefaultMutableTreeNode NodoEliminado = buscarNodoPorNombre(NodeNameField.getText());
+        DefaultMutableTreeNode NodoEliminado = buscarNodoPorNombre(nombreNodo);
         
         modelo.removeNodeFromParent(NodoEliminado);
+        this.gestor.SD.eliminarArch(archivoEliminado);
         this.dispose();
         
     }//GEN-LAST:event_DeleteButtonActionPerformed
@@ -185,7 +195,7 @@ public class EliminarNodo extends javax.swing.JFrame {
         
         // 4. Comparar el texto del nodo con lo que buscamos
         // Usamos equalsIgnoreCase para que no importen mayúsculas/minúsculas
-        if (nodo.getUserObject().toString().equalsIgnoreCase(nombreBuscado)) {
+        if (nodo.getUserObject().toString().equals(nombreBuscado)) {
             return nodo; // ¡Encontrado!
         }
     }

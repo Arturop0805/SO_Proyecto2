@@ -18,7 +18,7 @@ import Vista.ModificarNodo;
  */
 public class Principal extends javax.swing.JFrame {
     
-     Simulador Gestor = new Simulador();
+     Simulador Gestor = new Simulador(10);
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Principal.class.getName());
 
     /**
@@ -66,6 +66,7 @@ public class Principal extends javax.swing.JFrame {
         ChangeTypeButton = new javax.swing.JButton();
         BotonEliminar = new javax.swing.JButton();
         BotonModificar = new javax.swing.JButton();
+        BotonTablaArchivos = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -120,6 +121,13 @@ public class Principal extends javax.swing.JFrame {
             }
         });
 
+        BotonTablaArchivos.setText("Archivos");
+        BotonTablaArchivos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BotonTablaArchivosActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -129,7 +137,7 @@ public class Principal extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(0, 1, Short.MAX_VALUE)
+                        .addGap(0, 4, Short.MAX_VALUE)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                                 .addComponent(ChangeTypeButton)
@@ -143,6 +151,8 @@ public class Principal extends javax.swing.JFrame {
                                 .addContainerGap())))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(BotonModificar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(BotonTablaArchivos)
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel3Layout.setVerticalGroup(
@@ -156,7 +166,9 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(etiquetaUser, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ChangeTypeButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(BotonModificar)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(BotonModificar)
+                    .addComponent(BotonTablaArchivos))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(BotonAgregar)
@@ -188,7 +200,7 @@ public class Principal extends javax.swing.JFrame {
         
         DefaultTreeModel modelo = (DefaultTreeModel) Arbol.getModel();
         
-       CrearNodo Interfaz = new CrearNodo(modelo);
+       CrearNodo Interfaz = new CrearNodo(modelo, Gestor);
        Interfaz.setVisible(true);
        
         
@@ -209,7 +221,7 @@ public class Principal extends javax.swing.JFrame {
     private void BotonEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonEliminarActionPerformed
         
         DefaultTreeModel modelo = (DefaultTreeModel) Arbol.getModel();
-        EliminarNodo interfaz = new EliminarNodo(modelo);
+        EliminarNodo interfaz = new EliminarNodo(modelo, Gestor);
         interfaz.setVisible(true);
         
         
@@ -221,6 +233,15 @@ public class Principal extends javax.swing.JFrame {
         interfaz.setVisible(true);
     }//GEN-LAST:event_BotonModificarActionPerformed
 
+    private void BotonTablaArchivosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonTablaArchivosActionPerformed
+        
+        
+        TablaArchivos interfaz = new TablaArchivos(Gestor);
+          
+        interfaz.setVisible(true);
+        
+    }//GEN-LAST:event_BotonTablaArchivosActionPerformed
+
     
     
 
@@ -229,6 +250,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JButton BotonAgregar;
     private javax.swing.JButton BotonEliminar;
     private javax.swing.JButton BotonModificar;
+    private javax.swing.JButton BotonTablaArchivos;
     private javax.swing.JButton ChangeTypeButton;
     private javax.swing.JLabel etiquetaUser;
     private javax.swing.JMenu jMenu1;

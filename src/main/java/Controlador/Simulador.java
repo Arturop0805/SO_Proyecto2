@@ -6,11 +6,10 @@ package Controlador;
 
 
 
-import java.awt.BorderLayout;
 import javax.swing.JFrame;
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import Modelo.Archivo;
+import Modelo.Disco;
 /**
  *
  * @author Arturo
@@ -20,11 +19,12 @@ public class Simulador extends JFrame {
     
     
     private String TipoUsuario;
+    public Disco SD;
     
     
-    public Simulador(){
+    public Simulador(int tamañoDisco){
         this.TipoUsuario = "ADMIN";
-        
+        this.SD = new Disco(tamañoDisco);
     }
     
     public DefaultMutableTreeNode crearArbolPrueba(){
@@ -40,7 +40,21 @@ public class Simulador extends JFrame {
         Archivo apk2 = new Archivo("apk", false,34);
         
         
+        
+         SD.insertarArch(windows);
+         SD.insertarArch(system32);
+         SD.insertarArch(programUser);
+         SD.insertarArch(valorant);
+         SD.insertarArch(lol);
+         SD.insertarArch(data1);
+         SD.insertarArch(data2);
+         SD.insertarArch(apk1);
+         SD.insertarArch(apk2);
+
        
+      
+        
+        
         
        DefaultMutableTreeNode raiz = new DefaultMutableTreeNode(windows.getNombre(), windows.getEsDirectorio()); 
        DefaultMutableTreeNode carpeta1 = new DefaultMutableTreeNode(system32.getNombre(), system32.getEsDirectorio()); 
