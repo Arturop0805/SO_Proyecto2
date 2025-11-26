@@ -26,6 +26,7 @@ public class Archivo extends JFrame{
         this.EsDirectorio = EsDirectorio;
         this.size = size;
         this.ListaHijos = new ListaEnlazada();
+        this.ListaBloquesAsignados = new ListaEnlazada();
         this.enDisco = false;
     }
     
@@ -77,6 +78,10 @@ public class Archivo extends JFrame{
     
     public int getTamañoBloques() {
         return this.size;
+    }
+    
+    public void setTamañoBloques(int valor) {
+        this.size = valor;
     }
 }
 

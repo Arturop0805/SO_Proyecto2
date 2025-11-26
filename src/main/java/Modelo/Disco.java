@@ -5,6 +5,7 @@
 package Modelo;
 
 import EstructurasDeDatos.ListaEnlazada;
+<<<<<<< HEAD
 import EstructurasDeDatos.Nodo; // Asumimos que la clase Nodo es necesaria para obtener el dato
 
 public class Disco {
@@ -25,6 +26,33 @@ public class Disco {
             // El índice 'i' se usa como el blockID (la dirección)
             Bloque nuevoBloque = new Bloque(i); 
             this.sdBlocks.Insertar(nuevoBloque); // Insertar al final de la ListaEnlazada
+=======
+import EstructurasDeDatos.Nodo;
+/**
+ *
+ * @author Arturo
+ */
+public class Disco {
+    
+    private ListaEnlazada<Bloque> SD;
+    private ListaEnlazada<Archivo> ArchivosEnDisco;
+    private int size;
+    private int freeSpace;
+    
+    public Disco(int numBloques){
+        
+        this.SD = new ListaEnlazada<>();
+        this.ArchivosEnDisco = new ListaEnlazada<>();
+        //llena el disco de bloques vacios 
+        this.freeSpace = numBloques;
+        this.size = numBloques;
+        int contador = 0;
+        while (contador <= numBloques) {
+            Bloque bloqueDisco = new Bloque(true, null, contador);
+            
+            this.SD.Insertar(bloqueDisco);
+            contador++;
+>>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
         }
         this.bloquesLibres = this.capacidadBloques;
     }
@@ -37,6 +65,7 @@ public class Disco {
      * @return La dirección (blockID) del primer bloque asignado, o -1 si no hay espacio.
      */
     
+<<<<<<< HEAD
     
 
         // ----------------------------------------------------------------------------------
@@ -116,6 +145,68 @@ public class Disco {
                 this.bloquesLibres++;
 
                 currentBlockID = nextBlockID;
+=======
+    public ListaEnlazada getListaArchivos() {
+        return this.ArchivosEnDisco;
+    }
+    
+    //NO USAR AUN NO FUNCIONAN CORRECTAMENTE
+   public void agregarArchivo(Archivo archivo) {
+    int tamañoBloques = archivo.getTamañoBloques();
+    
+    int contador = 0;
+    int direccion = 0;
+    
+    if (this.freeSpace < tamañoBloques) {
+        return;  // No hay suficiente espacio libre
+    }
+    
+    archivo.setEnDisco(true);
+    
+    // Asigna bloques libres hasta cubrir el tamaño requerido
+    while (contador < tamañoBloques) { 
+        
+        
+        Bloque bloqueSeleccionado = SD.buscarPorIndice(direccion).getDato();
+        
+        if (bloqueSeleccionado.EstaVacio()) {  
+            bloqueSeleccionado.setVacio(false);
+            bloqueSeleccionado.asignarArchivo(archivo);
+            archivo.ListaBloquesAsignados.Insertar(bloqueSeleccionado);
+            contador++;
+            this.freeSpace--;
+        }
+        
+        direccion++;  // Siempre incrementa la dirección para buscar el siguiente bloque
+    }
+    
+    this.ArchivosEnDisco.Insertar(archivo);
+}
+   
+     //NO USAR AUN NO FUNCIONAN CORRECTAMENTE
+    public void eliminarArchivo(Archivo Archivo) {
+        int tamañoBloques = Archivo.getTamañoBloques();
+        int contador = 0;
+        int direccion = 0;
+        
+        if (Archivo.EstaEnDisco() == false) {
+            return;
+        }
+        
+        
+        while (contador <= tamañoBloques) {
+            Bloque bloqueSeleccionado = SD.buscarPorIndice(direccion).getDato();
+            if (bloqueSeleccionado.getArchivo() == Archivo) {
+                bloqueSeleccionado.liberar();
+                
+                
+                Archivo.ListaBloquesAsignados.eliminar(bloqueSeleccionado);
+                contador++;
+                this.ArchivosEnDisco.eliminar(Archivo);
+                this.freeSpace++;
+            } else {
+                direccion++;
+>>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
             }
         }
 
@@ -136,6 +227,7 @@ public class Disco {
         return capacidadBloques;
     }
     
+<<<<<<< HEAD
     /**
      * Obtener un bloque por su ID (dirección), usando la búsqueda por índice.
      */
@@ -149,3 +241,32 @@ public class Disco {
         return null; 
     }
 }
+=======
+    
+    
+    public void eliminarArch(Archivo dato) {
+       this.ArchivosEnDisco.eliminar(dato);  
+   }
+    
+    
+   public void insertarArch(Archivo dato){
+       this.ArchivosEnDisco.Insertar(dato);
+   }
+   
+   
+    
+    
+    public Archivo buscarPorNombre(String nombre){
+        Nodo<Archivo> auxiliar = this.ArchivosEnDisco.getHead();
+        
+        while (auxiliar != null) {
+            if (nombre.equals(auxiliar.getDato().getNombre())) {
+                return auxiliar.getDato();
+            } else {
+                auxiliar = auxiliar.getSiguiente();
+            }
+        }
+        return null;
+    }
+}
+>>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d

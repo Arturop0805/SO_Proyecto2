@@ -26,6 +26,9 @@ public class ListaEnlazada<T> {
         }
     }
     
+    public Nodo<T> getHead(){
+        return this.inicio;
+    }
     
     public Integer Tamaño() {
         return this.tamaño;
@@ -83,6 +86,8 @@ public class ListaEnlazada<T> {
         
   
     }
+    
+    
     
     
     public void InsertarPorIndice(int indice, T dato) {

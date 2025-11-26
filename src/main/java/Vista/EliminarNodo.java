@@ -4,6 +4,8 @@
  */
 package Vista;
 
+import Controlador.Simulador;
+import Modelo.Archivo;
 import java.util.Enumeration;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -20,9 +22,16 @@ public class EliminarNodo extends javax.swing.JFrame {
 
    private AdministradorDirectorios adminFS;
    private DefaultTreeModel modelo;
+<<<<<<< HEAD
     
     public EliminarNodo(DefaultTreeModel modeloArbol, AdministradorDirectorios adminFS) {
+=======
+   private Simulador gestor;
+    public EliminarNodo(DefaultTreeModel modeloArbol, Simulador gestor) {
+>>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
         initComponents();
+        
+        this.gestor = gestor;
         this.setSize(500, 200);
         this.setResizable(false);
         
@@ -167,8 +176,14 @@ public class EliminarNodo extends javax.swing.JFrame {
     }//GEN-LAST:event_SelectButtonActionPerformed
 
     private void DeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteButtonActionPerformed
+        String nombreNodo = NodeNameField.getText();
+        Archivo archivoEliminado = this.gestor.SD.buscarPorNombre(nombreNodo);
         
+        if (archivoEliminado == null) {
+            return;
+        }
         
+<<<<<<< HEAD
         String nombreSeleccionado = NodeNameField.getText();
     
         // 1. Buscar el nodo Swing (DefaultMutableTreeNode)
@@ -194,6 +209,13 @@ public class EliminarNodo extends javax.swing.JFrame {
             // Manejo de errores (ej. permisos, directorio no vacío, etc.)
             // JOptionPane.showMessageDialog(this, "Error al eliminar el nodo.", "Error", JOptionPane.ERROR_MESSAGE);
         }
+=======
+        DefaultMutableTreeNode NodoEliminado = buscarNodoPorNombre(nombreNodo);
+        
+        modelo.removeNodeFromParent(NodoEliminado);
+        this.gestor.SD.eliminarArch(archivoEliminado);
+        this.dispose();
+>>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
         
     }//GEN-LAST:event_DeleteButtonActionPerformed
 
@@ -210,7 +232,7 @@ public class EliminarNodo extends javax.swing.JFrame {
         
         // 4. Comparar el texto del nodo con lo que buscamos
         // Usamos equalsIgnoreCase para que no importen mayúsculas/minúsculas
-        if (nodo.getUserObject().toString().equalsIgnoreCase(nombreBuscado)) {
+        if (nodo.getUserObject().toString().equals(nombreBuscado)) {
             return nodo; // ¡Encontrado!
         }
     }

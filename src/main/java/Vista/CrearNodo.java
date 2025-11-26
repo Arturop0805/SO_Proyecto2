@@ -4,6 +4,7 @@
  */
 package Vista;
 
+import Controlador.Simulador;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import Controlador.Simulador;
@@ -21,10 +22,17 @@ public class CrearNodo extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CrearNodo.class.getName());
 
     private DefaultTreeModel modelo;
+<<<<<<< HEAD
     private Simulador gestorFS;
     
     public CrearNodo(DefaultTreeModel modeloArbol, Simulador gestor) {
+=======
+    private Simulador Gestor;
+    
+    public CrearNodo(DefaultTreeModel modeloArbol, Simulador Gestor) {
+>>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
         initComponents();
+        this.Gestor = Gestor;
         this.setSize(560, 360);
         this.setResizable(false);
         ListaPadres.removeAllItems();
@@ -172,6 +180,11 @@ public class CrearNodo extends javax.swing.JFrame {
                 NameFieldActionPerformed(evt);
             }
         });
+        NameField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                NameFieldKeyTyped(evt);
+            }
+        });
 
         jLabel1.setText("Tamaño (Bloques)");
 
@@ -279,11 +292,27 @@ public class CrearNodo extends javax.swing.JFrame {
         String tamañoTexto = SizeTextField.getText().trim();
         int tamañoNumero = 0;
 
+<<<<<<< HEAD
         // 1. Validación de nombre
         if (nombre.isEmpty()) {
             JOptionPane.showMessageDialog(this, "El nombre no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
+=======
+        Archivo auxiliar = this.Gestor.SD.buscarPorNombre(NameField.getText());
+         if (auxiliar != null)  {
+             return;
+         } 
+try {
+    TamañoNumero = Integer.parseInt(TamañoTexto.trim());
+  
+} catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+            "El valor ingresado no es un número válido. Por favor escribe solo dígitos.",
+            "Error de formato",
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+>>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
             return;
         }
+<<<<<<< HEAD
 
         // 2. Validación y obtención de tamaño
         try {
@@ -337,12 +366,43 @@ public class CrearNodo extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "ERROR: No se pudo crear la entrada. Verifique el nombre, el espacio disponible en disco y los permisos.", "Error de Sistema de Archivos", JOptionPane.ERROR_MESSAGE);
         }
 
+=======
+        
+        Archivo archivo = new Archivo(NameField.getText(),EsDirectorio,TamañoNumero);
+        
+        
+        
+        
+        DefaultMutableTreeNode NuevoNodo = new DefaultMutableTreeNode(archivo.getNombre(),EsDirectorio);
+        DefaultMutableTreeNode Padre = buscarNodoPorNombre(SelectedField.getText());
+        int indice = Padre.getChildCount();
+        modelo.insertNodeInto(NuevoNodo, Padre, indice);
+        
+        Gestor.SD.insertarArch(archivo);
+        this.dispose();
+>>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
     }//GEN-LAST:event_CreateButtonActionPerformed
 
     private void BackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackButtonActionPerformed
         this.dispose();
         
     }//GEN-LAST:event_BackButtonActionPerformed
+
+    private void NameFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_NameFieldKeyTyped
+             // 1. Obtenemos el carácter que el usuario acaba de teclear
+    char c = evt.getKeyChar();
+
+    // 2. Verificamos si NO es una letra Y tampoco es un espacio
+    // (Añade más condiciones si necesitas permitir algo más)
+    if (!Character.isLetter(c) && c != ' ') {
+        
+        // 3. "Consumimos" el evento para que no se procese (no se escribe)
+        evt.consume();
+        
+        // Opcional: Emitir un pitido para avisar al usuario
+        java.awt.Toolkit.getDefaultToolkit().beep();
+    }
+    }//GEN-LAST:event_NameFieldKeyTyped
 
     
     public DefaultMutableTreeNode buscarNodoPorNombre(String nombreBuscado) {

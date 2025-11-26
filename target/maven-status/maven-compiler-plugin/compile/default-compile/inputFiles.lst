@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\com\mycompany\so_proyecto2\SO_Proyecto2.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Controlador\AdministradorDirectorios.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Controlador\Simulador.java
@@ -13,3 +14,18 @@ D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Vista\EliminarNodo.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Vista\ModificarNodo.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Vista\Principal.java
+=======
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\com\mycompany\so_proyecto2\SO_Proyecto2.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\Controlador\Simulador.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\EstructurasDeDatos\Cola.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\EstructurasDeDatos\ListaEnlazada.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\EstructurasDeDatos\Nodo.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\Modelo\Archivo.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\Modelo\Bloque.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\Modelo\Disco.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\Vista\CrearNodo.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\Vista\EliminarNodo.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\Vista\ModificarNodo.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\Vista\Principal.java
+C:\Users\Arturo\Desktop\SO_Proyecto2\SO_Proyecto2\src\main\java\Vista\TablaArchivos.java
+>>>>>>> 397e2148f20879731e40545b63d12913a1f16d7d
