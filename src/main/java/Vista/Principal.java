@@ -34,7 +34,7 @@ public class Principal extends javax.swing.JFrame implements TreeSelectionListen
         this.setResizable(false);
         
         // 1. Obtener el modelo inicial del simulador (árbol de prueba)
-        DefaultTreeModel modelo = Gestor.crearArbolPrueba(); 
+        DefaultTreeModel modelo = Gestor.obtenerModeloArbolFS(); 
         
         // 2. Establecer el modelo en el JTree y configuración
         modelo.setAsksAllowsChildren(true);
@@ -66,7 +66,7 @@ public class Principal extends javax.swing.JFrame implements TreeSelectionListen
 
 public void refrescarArbol(Object entradaModeloSeleccionada) {
     // 1. Recrear el modelo completo desde el Controlador
-    DefaultTreeModel nuevoModelo = this.Gestor.crearArbolPrueba(); // Usa 'Gestor'
+    DefaultTreeModel nuevoModelo = this.Gestor.obtenerModeloArbolFS(); // Usa 'Gestor'
     this.Arbol.setModel(nuevoModelo); // Usa 'Arbol'
     this.Arbol.expandRow(0); // Expande la raíz (opcional)
 

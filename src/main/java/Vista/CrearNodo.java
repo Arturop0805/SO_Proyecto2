@@ -8,9 +8,11 @@ package Vista;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import Controlador.Simulador;
-import Modelo.DirectorioEntrada;
+import Modelo.EstructuraArchivo; // CAMBIO CLAVE: Reemplaza DirectorioEntrada
+import Modelo.Directorio; // Se agrega para el manejo explícito del padre
 import java.util.Enumeration;
 import javax.swing.JOptionPane;
+
 
 
 /**
@@ -31,29 +33,33 @@ public class CrearNodo extends javax.swing.JFrame {
         // Asignación de gestor
         this.gestorFS = gestor;
         this.ventanaPrincipal = ventanaPrincipal;
-        
+		
         this.setSize(560, 360);
         this.setResizable(false);
-        
+		
         // Limpieza y asignación de modelo
         ListaPadres.removeAllItems();
         this.modelo = modeloArbol;
-        
+		
         // Carga inicial de directorios disponibles
         DefaultMutableTreeNode raiz = (DefaultMutableTreeNode) modeloArbol.getRoot();
         this.cargarNodosRecursivo(raiz);
-        
+		
         // Muestra la raíz como padre inicial
-        // Se asume que la raíz es un DirectorioEntrada, si no, se usa "Raiz"
+        // Se asume que la raíz es un EstructuraArchivo o un String (si Simulador crea el JTree con un String en la raíz)
         Object raizDataObj = raiz.getUserObject();
-        String nombreRaiz = (raizDataObj instanceof DirectorioEntrada) ? 
-                            ((DirectorioEntrada)raizDataObj).getNombre() : 
-                            "Raiz";
+        String nombreRaiz;
+        if (raizDataObj instanceof EstructuraArchivo) {
+            nombreRaiz = ((EstructuraArchivo)raizDataObj).getNombre();
+        } else if (raizDataObj != null) {
+             nombreRaiz = raizDataObj.toString(); // Si es un String (por ejemplo, "Raiz")
+        } else {
+             nombreRaiz = "Raiz"; // Fallback
+        }
         SelectedField.setText(nombreRaiz);
-        
-        // CORRECCIÓN 1: Configurar el estado inicial de los campos
-        // El estado inicial es "Archivo" según initComponents, pero el botón dice "Archivo" (para cambiar a Directorio)
-        if (TypeChanger.getText().equals("Directorio")) { // Se asume que el texto es lo que se VA A CREAR
+		
+        // CORRECCIÓN 1: Configurar el estado inicial de los campos (La lógica se ve correcta)
+        if (TypeChanger.getText().equals("Directorio")) { 
              // Si el botón dice "Directorio", significa que el tipo actual es ARCHIVO
              SizeTextField.setEnabled(true);
              SizeTextField.setText("1"); // Valor por defecto
@@ -66,18 +72,19 @@ public class CrearNodo extends javax.swing.JFrame {
              Label.setText("Nuevo Directorio");
              jLabel1.setText("Tamaño (Bloques) [N/A]");
         }
+	
     
     }
     
     private void cargarNodosRecursivo(DefaultMutableTreeNode nodo) {
         Object userObject = nodo.getUserObject();
 
-        // Solo procesamos nodos que contienen nuestro modelo de datos real (DirectorioEntrada)
-        if (userObject instanceof DirectorioEntrada) {
-            DirectorioEntrada entrada = (DirectorioEntrada) userObject;
+        // Solo procesamos nodos que contienen nuestro modelo de datos real (EstructuraArchivo)
+        if (userObject instanceof EstructuraArchivo) { // USO DE ESTRUCTURAARCHIVO
+            EstructuraArchivo entrada = (EstructuraArchivo) userObject;
 
             // Solo agregamos directorios a la lista de padres disponibles
-            if (entrada.getEsDirectorio()){
+            if (entrada.esDirectorio()){ // USO DE esDirectorio()
                 ListaPadres.addItem(entrada.getNombre());
             }
         }
@@ -282,7 +289,8 @@ public class CrearNodo extends javax.swing.JFrame {
     private void SelectParentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SelectParentActionPerformed
      
     
-    SelectedField.setText(ListaPadres.getSelectedItem().toString());
+    // La lógica está bien: toma el nombre seleccionado del ComboBox
+        SelectedField.setText(ListaPadres.getSelectedItem().toString());
         
         
         
@@ -291,19 +299,19 @@ public class CrearNodo extends javax.swing.JFrame {
     private void TypeChangerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TypeChangerActionPerformed
        
        if (TypeChanger.getText().equals("Directorio")) {
-          TypeChanger.setText("Archivo");  
-          // Ahora estamos creando un DIRECTORIO
-          SizeTextField.setEnabled(false);
-          SizeTextField.setText("0");
-          jLabel1.setText("Tamaño (Bloques) [N/A]");
-          Label.setText("Nuevo Directorio");
+             TypeChanger.setText("Archivo");  
+             // Ahora estamos creando un DIRECTORIO
+             SizeTextField.setEnabled(false);
+             SizeTextField.setText("0");
+             jLabel1.setText("Tamaño (Bloques) [N/A]");
+             Label.setText("Nuevo Directorio");
         } else {
-            TypeChanger.setText("Directorio"); 
-            // Ahora estamos creando un ARCHIVO
-            SizeTextField.setEnabled(true);
-            SizeTextField.setText("1"); // Default para archivo
-            jLabel1.setText("Tamaño (Bloques)");
-            Label.setText("Nuevo Archivo");
+             TypeChanger.setText("Directorio"); 
+             // Ahora estamos creando un ARCHIVO
+             SizeTextField.setEnabled(true);
+             SizeTextField.setText("1"); // Default para archivo
+             jLabel1.setText("Tamaño (Bloques)");
+             Label.setText("Nuevo Archivo");
         }
         
     }//GEN-LAST:event_TypeChangerActionPerformed
@@ -325,13 +333,8 @@ public class CrearNodo extends javax.swing.JFrame {
         }
 
         // 2. Determinar el tipo y validar/obtener el tamaño
-        // El texto del botón es el tipo al que CAMBIA, por lo tanto, el tipo actual es el opuesto.
-        // Se corrige la lógica: si dice "Archivo" es porque el actual es Directorio.
-        boolean esDirectorio = TypeChanger.getText().equals("Archivo"); // Si dice "Archivo", el tipo actual es DIRECTORIO.
-        esDirectorio = !esDirectorio; // Se invierte la lógica: Si el botón dice "Archivo", estamos creando un DIRECTORIO. Si el botón dice "Directorio", estamos creando un ARCHIVO. 
-        
-        // CORRECCIÓN LÓGICA: El label "Nuevo..." indica qué estamos creando. El botón indica a qué cambia.
-        esDirectorio = Label.getText().contains("Directorio");
+        // La etiqueta (Label) es la que determina qué tipo se va a crear.
+        boolean esDirectorio = Label.getText().contains("Directorio");
 
 
         if (esDirectorio) {
@@ -348,49 +351,57 @@ public class CrearNodo extends javax.swing.JFrame {
                 return;
             }
         }
-        
-        // 3. Buscar el nodo padre en el JTree y obtener su objeto de datos real (DirectorioEntrada)
+		
+        // 3. Buscar el nodo padre en el JTree y obtener su objeto de datos real (EstructuraArchivo)
         String nombrePadre = SelectedField.getText();
         DefaultMutableTreeNode nodoPadreSwing = buscarNodoPorNombre(nombrePadre);
+		
+        // VALIDACIÓN MEJORADA: Asegurar que el objeto en el nodo existe y ES UN DIRECTORIO
+        if (nodoPadreSwing == null || !(nodoPadreSwing.getUserObject() instanceof EstructuraArchivo)) { // Uso de EstructuraArchivo
+             JOptionPane.showMessageDialog(this, "Error interno: No se encontró el directorio padre seleccionado o no contiene una estructura válida.", "Error Interno", JOptionPane.ERROR_MESSAGE);
+             return;
+        }
         
-        if (nodoPadreSwing == null || !(nodoPadreSwing.getUserObject() instanceof DirectorioEntrada)) {
-             JOptionPane.showMessageDialog(this, "Error interno: No se encontró el directorio padre seleccionado o no es un directorio válido.", "Error Interno", JOptionPane.ERROR_MESSAGE);
+        EstructuraArchivo padreEstructura = (EstructuraArchivo) nodoPadreSwing.getUserObject();
+        if (!padreEstructura.esDirectorio()) { // Verificación obligatoria
+             JOptionPane.showMessageDialog(this, "Error: El nodo seleccionado '" + nombrePadre + "' no es un directorio válido para agregar contenido.", "Error de Lógica", JOptionPane.ERROR_MESSAGE);
              return;
         }
 
-        DirectorioEntrada padreFS = (DirectorioEntrada) nodoPadreSwing.getUserObject();
+        // Se castea a Directorio, ya que un Directorio es el objeto que realmente maneja los hijos.
+        Directorio padreFS = (Directorio) padreEstructura; // USO DE DIRECTORIO PARA EL PADRE
 
         // 4. DELEGAR la creación al AdministradorDirectorios (Lógica de Negocio)
-        DirectorioEntrada nuevaEntradaFS = gestorFS.getAdminFS().crearEntrada(
+        // NOTA: Revisa tu clase Simulador.getAdminFS() ya que no está definida en el código que me diste.
+        EstructuraArchivo nuevaEntradaFS = gestorFS.getAdminFS().( // CAMBIO DE TIPO DE RETORNO A EstructuraArchivo
             nombre, 
             esDirectorio, 
             tamañoNumero, 
-            padreFS, 
+            padreFS, // Le pasamos el objeto Directorio
             gestorFS.getTipoUsuario() // Se usa el tipo de usuario para la comprobación de permisos
         );
 
         if (nuevaEntradaFS != null) {
-    
-        
+		
+		
             // 5. Si se creó correctamente en el modelo (AdminFS), sincronizar el JTree
-            boolean isDirectory = nuevaEntradaFS.getEsDirectorio();
+            boolean isDirectory = nuevaEntradaFS.esDirectorio(); // USO DE esDirectorio()
 
-            // **Asegúrate de que el constructor de JTree sepa si puede tener hijos (isDirectorio)**
+            // Asegúrate de que el constructor de JTree sepa si puede tener hijos (isDirectorio)
             DefaultMutableTreeNode nuevoNodoSwing = new DefaultMutableTreeNode(nuevaEntradaFS, isDirectory); 
 
             // Añadir el nodo al JTree y notificar al modelo
             modelo.insertNodeInto(nuevoNodoSwing, nodoPadreSwing, nodoPadreSwing.getChildCount());
 
             // Forzar que el árbol muestre el nuevo nodo
-            // ¡CRÍTICO! modelo.reload(nodoPadreSwing); es la línea clave.
-            // Si no funciona, puede ser necesario recargar el árbol COMPLETO.
             modelo.reload(nodoPadreSwing);
-            
-            DefaultMutableTreeNode nuevoNodoASeleccionar = new DefaultMutableTreeNode(nuevaEntradaFS);
-            ventanaPrincipal.refrescarArbol(nuevoNodoASeleccionar); // Llamada para forzar la actualización y SELECCIÓN // Llamada para forzar la actualización
+			
+            // La línea siguiente es redundante si solo se necesita seleccionar el nuevo nodo
+            // pero si la ventana Principal hace más cosas, se mantiene.
+            ventanaPrincipal.refrescarArbol(nuevoNodoSwing); // Se pasa el nuevo nodo, no una copia
             JOptionPane.showMessageDialog(this, "Entrada '" + nombre + "' creada con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
-            
+			
         } else {
             // El AdministradorDirectorios ya mostró el error específico (duplicado, espacio, permiso)
         }
@@ -406,12 +417,12 @@ public class CrearNodo extends javax.swing.JFrame {
              // 1. Obtenemos el carácter que el usuario acaba de teclear
         char c = evt.getKeyChar();
 
-        // CORRECCIÓN 3: Permitir letras, números y espacios
+        // Permitir letras, números y espacios
         if (!Character.isLetterOrDigit(c) && c != ' ') {
-            
+			
             // 3. "Consumimos" el evento para que no se procese (no se escribe)
             evt.consume();
-            
+			
             // Opcional: Emitir un pitido para avisar al usuario
             java.awt.Toolkit.getDefaultToolkit().beep();
         }
@@ -422,15 +433,15 @@ public class CrearNodo extends javax.swing.JFrame {
     DefaultMutableTreeNode raiz = (DefaultMutableTreeNode) modelo.getRoot();
     // Usamos una enumeración de búsqueda en amplitud (breadthFirstEnumeration)
     Enumeration e = raiz.breadthFirstEnumeration();
-    
+	
     while (e.hasMoreElements()) {
         DefaultMutableTreeNode nodo = (DefaultMutableTreeNode) e.nextElement();
         Object userObject = nodo.getUserObject();
 
-        if (userObject instanceof DirectorioEntrada) {
-            DirectorioEntrada entrada = (DirectorioEntrada) userObject;
-            
-            // Compara el nombre del objeto DirectorioEntrada real
+        if (userObject instanceof EstructuraArchivo) { // USO DE ESTRUCTURAARCHIVO
+            EstructuraArchivo entrada = (EstructuraArchivo) userObject;
+			
+            // Compara el nombre del objeto EstructuraArchivo real
             if (entrada.getNombre().equalsIgnoreCase(nombreBuscado)) {
                 return nodo; 
             }

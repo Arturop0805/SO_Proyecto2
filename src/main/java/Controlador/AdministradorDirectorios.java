@@ -25,7 +25,7 @@ public class AdministradorDirectorios {
     
     // Constantes de Permisos
     private static final String USUARIO_ROOT = "ROOT";
-    private static final String USUARIO_ADMIN = "ADMIN";
+    private static String USUARIO_ADMIN = "ADMIN";
     private static final String USUARIO_STANDARD = "USER";
     
     /**
@@ -180,7 +180,7 @@ public class AdministradorDirectorios {
     private boolean verificarPermisos(EstructuraArchivo entrada, String usuario, String accion) {
         // ADVERTENCIA: Esta lógica necesita que EstructuraArchivo tenga un método getPropietario()
         // implementado y que Archivo lo herede correctamente.
-        if (usuario.equalsIgnoreCase(USUARIO_ROOT) || usuario.equalsIgnoreCase(USUARIO_ADMIN)) {
+        if (usuario.equalsIgnoreCase(USUARIO_ROOT) || usuario.equalsIgnoreCase(getUSUARIO_ADMIN())) {
              return true;
         }
         
@@ -207,4 +207,21 @@ public class AdministradorDirectorios {
     public Directorio getRaiz() { return this.raiz; } 
     
     public DiscoSimulado getDisco() { return this.disco; }
+
+    /**
+     * @return the USUARIO_ADMIN
+     */
+    public static String getUSUARIO_ADMIN() {
+        return USUARIO_ADMIN;
+    }
+
+    /**
+     * @param aUSUARIO_ADMIN the USUARIO_ADMIN to set
+     */
+    public static void setUSUARIO_ADMIN(String aUSUARIO_ADMIN) {
+        USUARIO_ADMIN = aUSUARIO_ADMIN;
+    }
+    
+    
+    
 }

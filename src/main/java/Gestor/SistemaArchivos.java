@@ -42,7 +42,7 @@ public class SistemaArchivos {
      */
     public EstructuraArchivo buscarRuta(String ruta) {
         if (ruta == null || ruta.equals("/") || ruta.equalsIgnoreCase("root")) {
-            return raiz;
+            return getRaiz();
         }
 
         // 1. Normalizar la ruta (eliminar barra inicial si existe)
@@ -51,7 +51,7 @@ public class SistemaArchivos {
             rutaLimpia = rutaLimpia.substring(1);
         }
         
-        Directorio actual = raiz;
+        Directorio actual = getRaiz();
         EstructuraArchivo resultado = null;
         String pathRestante = rutaLimpia;
         
@@ -275,10 +275,19 @@ public class SistemaArchivos {
     }
     
     // --- Getters y Setters de Estado ---
+    
+    
 
     public Directorio getRaiz() { return raiz; }
     public DiscoSimulado getDisco() { return disco; }
     public PlanificadorDisco getPlanificador() { return planificador; }
     public ModoUsuario getModoActual() { return modoActual; }
     public void setModoActual(ModoUsuario modoActual) { this.modoActual = modoActual; }
+
+    /**
+     * @param raiz the raiz to set
+     */
+    public void setRaiz(Directorio raiz) {
+        this.raiz = raiz;
+    }
 }
