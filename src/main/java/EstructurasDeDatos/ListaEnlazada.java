@@ -4,10 +4,8 @@
  */
 package EstructurasDeDatos;
 
-/**
- *
- * @author Arturo
- */
+import javax.swing.JOptionPane;
+
 public class ListaEnlazada<T> {
     
     private Nodo<T> inicio;
@@ -18,129 +16,54 @@ public class ListaEnlazada<T> {
         this.tamaño = 0;
     }
     
-    public Boolean EstaVacia() {
-        if (this.inicio == null) {
-            return true;
-        } else {
-            return false;
-        }
+    // ✅ Mejora: Simplificación de la lógica booleana
+    public boolean EstaVacia() {
+        return this.inicio == null;
     }
     
-    public Nodo<T> getHead(){
+    // ✅ Mejora: Nombre más estándar (getInicio/getHead son comunes)
+    public Nodo<T> getInicio(){
         return this.inicio;
     }
     
-    public Integer Tamaño() {
+    // ✅ Mejora: Devolver tipo primitivo int (aunque Integer es funcional)
+    public int getTamaño() {
         return this.tamaño;
     }
     
+    // --- MÉTODOS DE INSERCIÓN ---
+    
     public void Insertar(T dato) {
-        
-        Nodo<T> NuevoNodo = new Nodo<>();
-        NuevoNodo.setDato(dato);
+        Nodo<T> nuevoNodo = new Nodo<>(dato, this.tamaño); 
         
         if (this.EstaVacia()) {
-            
-            this.inicio = NuevoNodo;
-            
-            
+            this.inicio = nuevoNodo;
         } else {
-           
-             Nodo<T> auxiliar = this.inicio;
-            
+            Nodo<T> auxiliar = this.inicio;
             while (auxiliar.getSiguiente() != null) {
                 auxiliar = auxiliar.getSiguiente();
             }
-            
-            auxiliar.setSiguiente(NuevoNodo);
+            auxiliar.setSiguiente(nuevoNodo);
         }
-        
-        
-        
-      
         this.tamaño++;
-        this.ActualizarIndices();
-    }
-    
-    
-    public void print() {
-        
-        Nodo<T> auxiliar = this.inicio;
-        
-        while (auxiliar != null) {
-            System.out.println("valor: " + auxiliar.getDato() + " indice: " + auxiliar.getIndice());
-            auxiliar = auxiliar.getSiguiente();
-        }
-     
-        
     }
     
     public void InsertarAlInicio(T dato) {
-        Nodo<T> NuevoNodo = new Nodo<>();
-        NuevoNodo.setDato(dato);
+        // O(1) para la inserción
+        Nodo<T> nuevoNodo = new Nodo<>(dato, 0); 
+        nuevoNodo.setSiguiente(this.inicio);
+        this.inicio = nuevoNodo;
+        this.tamaño++;
         
-        NuevoNodo.setSiguiente(this.inicio);
-        this.inicio = NuevoNodo;
-        tamaño++;
-        this.ActualizarIndices();
-        
-  
+        // O(n) para reindexar (necesario por diseño con índices)
+        this.IncrementarIndicesExistentes(); 
     }
     
-    
-    
-    
-    public void InsertarPorIndice(int indice, T dato) {
-          
-        Nodo<T> NuevoNodo = new Nodo<>();
-        NuevoNodo.setDato(dato);
-        
-        Nodo<T> auxiliar = this.inicio;
-        
-        
-       
-        
-        if (indice > this.tamaño) {
-            System.out.println("Indice mayor al tamaño de la lista");
-            return;
-        }
-        
-        
-        if (indice == 0) {
-            this.InsertarAlInicio(dato);
-            return;
-        }
-        
-        if (indice == tamaño) {
-            this.Insertar(dato);{
-            return;
-        }
-        }
-        
-        while (auxiliar.getSiguiente().getIndice() != indice) {
-       
-               auxiliar = auxiliar.getSiguiente();
-               
-        }
-        
-        
-        if (auxiliar.getSiguiente().getIndice() == indice) {
-            NuevoNodo.setSiguiente(auxiliar.getSiguiente());
-            auxiliar.setSiguiente(NuevoNodo);
+    private void IncrementarIndicesExistentes() {
+        // Este método es necesario solo porque InsertarAlInicio mueve todos los índices hacia adelante.
+        int contador = 1;
+        Nodo<T> auxiliar = this.inicio.getSiguiente(); 
 
-        }
-          
-        
-        this.ActualizarIndices();
-        tamaño++;
-      }
-    
-    
-    private void ActualizarIndices(){
-        int contador = 0;
-        Nodo<T> auxiliar = this.inicio;
-        
-        
         while (auxiliar != null) {
             auxiliar.setIndice(contador);
             auxiliar = auxiliar.getSiguiente();
@@ -148,127 +71,78 @@ public class ListaEnlazada<T> {
         }
     }
     
-    
-   public boolean eliminar(T dato) {
-    if (this.EstaVacia()) {
-        System.out.println("esta vacia");
+    // --- MÉTODO CRUCIAL PARA ELIMINACIÓN ---
+    public boolean eliminar(T dato) {
+        if (this.EstaVacia()) {
+            JOptionPane.showMessageDialog(null, "La lista está vacía, no se puede eliminar.", "Error", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        
+        // Caso 1: Eliminar la cabeza
+        if (this.inicio.getDato().equals(dato)) {
+            this.inicio = this.inicio.getSiguiente();
+            this.tamaño--;
+            
+            if (this.inicio != null) {
+                // ✅ CONSOLIDACIÓN: Usamos el método de reasignación desde la nueva cabeza.
+                this.ReasignarIndicesDesde(this.inicio); 
+            }
+            return true;
+        }
+        
+        // Caso 2: Buscar y eliminar en el medio/final
+        Nodo<T> auxiliar = this.inicio;
+        
+        while (auxiliar.getSiguiente() != null) {
+            if (auxiliar.getSiguiente().getDato().equals(dato)) {
+                
+                Nodo<T> nodoSiguiente = auxiliar.getSiguiente().getSiguiente(); 
+                auxiliar.setSiguiente(nodoSiguiente);
+                this.tamaño--; 
+                
+                if (nodoSiguiente != null) {
+                    // ✅ CONSOLIDACIÓN: Reasignación solo de los nodos posteriores.
+                    this.ReasignarIndicesDesde(nodoSiguiente); 
+                }
+                return true;
+            }
+            auxiliar = auxiliar.getSiguiente();
+        }
+        
+        // Caso 3: No se encontró el elemento
         return false;
     }
     
-    // Caso especial: eliminar la cabeza
-    if (this.inicio.getDato().equals(dato)) {
-        this.inicio = this.inicio.getSiguiente();
-        System.out.println("eliminado: " + dato);
-        this.ActualizarIndices(); 
-        return true;
-    }
-    
-    Nodo<T> auxiliar = this.inicio;
-    
-    while (auxiliar.getSiguiente() != null) {
-        if (auxiliar.getSiguiente().getDato().equals(dato)) {
-            
-           
-            
-            auxiliar.setSiguiente(auxiliar.getSiguiente().getSiguiente());
-            System.out.println("eliminado: " + dato);
-            this.ActualizarIndices();  
-            return true;
-        } else {
-            auxiliar = auxiliar.getSiguiente();
-        }
-    }
-    
-    // Si no se encontró el elemento
-    System.out.println("elemento no encontrado");
-    return false;
-}
-
-    
-   
-   
-   public void buscar(T dato) {
-       Nodo<T> auxiliar = this.inicio;
-       
-       while (auxiliar.getSiguiente() != null) {
-           if (auxiliar.getSiguiente().getDato() == dato) {
-               System.out.println("se encontro: "+ auxiliar.getSiguiente().getDato() + "indice: " + auxiliar.getSiguiente().getIndice());
-           }
-           auxiliar = auxiliar.getSiguiente();
-       }
-   }
-   
-   public Nodo<T> buscarPorIndice(int indice) {
-       
-       if (indice < 0 || indice >= this.tamaño) {
-        return null; // Índice fuera de límites
-        }
-       
-       Nodo auxiliar = this.inicio;
-       
-       while (auxiliar != null) {
-           if (auxiliar.getIndice() == indice){
-               return auxiliar;
-           }
-           auxiliar = auxiliar.getSiguiente();
-       }
-       
-       
-       return null;
-   }
-   
-   /**
- * Diagnóstico: Muestra todos los nodos e índices en la lista.
- */
-    public void diagnosticoIndices() {
-        System.out.println("\n--- DIAGNÓSTICO DE ÍNDICES DE LA LISTA ENLAZADA ---");
-        Nodo<T> auxiliar = this.inicio;
-        while (auxiliar != null) {
-            // Asumiendo que T es Bloque, obtendremos el ID del bloque
-            String datoStr = auxiliar.getDato() != null ? auxiliar.getDato().toString() : "NULL";
-
-            System.out.println(String.format("Índice de Nodo: %02d | Contenido: %s", 
-                                              auxiliar.getIndice(), datoStr));
-            auxiliar = auxiliar.getSiguiente();
-        }
-        System.out.println("-------------------------------------------------");
-    }
-    
-    public Nodo<T> getInicio() {
-        return this.inicio;
-    }
-
+    // --- CONSOLIDACIÓN DE REINDEXACIÓN (Reemplaza a ActualizarIndices y DecrementarIndicesPosteriores) ---
     /**
-     * Permite establecer el nodo inicial de la lista.
-     * Útil si se necesita reemplazar la cabeza de la lista directamente.
-     * @param inicio El nuevo nodo de inicio.
+     * Reasigna los índices de forma progresiva a partir del nodo especificado.
+     * Útil después de una eliminación o extracción en cualquier punto.
      */
-    public void setInicio(Nodo<T> inicio) {
-        this.inicio = inicio;
+    private void ReasignarIndicesDesde(Nodo<T> nodoDeCorte) {
+        Nodo<T> auxiliar = nodoDeCorte; 
+        int contador = nodoDeCorte.getIndice(); // El índice del nodo de corte es el punto de inicio
+
+        while (auxiliar != null) {
+            auxiliar.setIndice(contador);
+            auxiliar = auxiliar.getSiguiente();
+            contador++;
+        }
     }
+    
+    // --- MÉTODOS ADICIONALES ---
     
     public T ExtraerInicio() {
-    if (this.EstaVacia()) {
-        return null;
-    }
-    
-    // 1. Guardar el dato a devolver
-    T datoExtraido = this.inicio.getDato();
-    
-    // 2. Mover la cabeza al siguiente nodo
-    this.inicio = this.inicio.getSiguiente();
-    
-    // 3. Reducir tamaño y actualizar índices
-    this.tamaño--;
-    
-    // Si usas el método ActualizarIndices, llámalo aquí:
-    // this.ActualizarIndices();
-    
-    // Si usas la asignación de índice en Insertar (recomendado), no necesitas ActualizarIndices
-    
-    return datoExtraido;
-    }
-    
-}
+        if (this.EstaVacia()) {
+            return null;
+        }
+        
+        T datoExtraido = this.inicio.getDato();
+        this.inicio = this.inicio.getSiguiente();
+        this.tamaño--;
 
-    
+        if (this.inicio != null) {
+            this.ReasignarIndicesDesde(this.inicio); 
+        }
+        return datoExtraido;
+    }
+}    

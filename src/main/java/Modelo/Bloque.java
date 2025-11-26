@@ -3,24 +3,25 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Modelo;
-/**
- *
- * @author Arturo
- */
 
+/**
+ * Representa un Bloque de Disco en un Sistema de Archivos con Asignación Encadenada.
+ * Cada bloque almacena un puntero al siguiente bloque del mismo archivo.
+ * * @author Arturo
+ */
 public class Bloque {
     
     // Identificación del Bloque (Dirección)
-    private int blockID;              // La "direccion" del bloque
+    private final int blockID;              // La "direccion" del bloque (Constante)
     
     // Asignación Encadenada (¡CRÍTICO!)
     // Almacena el blockID del siguiente bloque del archivo. Usar -1 para fin de archivo.
-    private int punteroSiguiente;   
+    private int punteroSiguiente;           
 
     // Estado y Propietario
-    private boolean isOccupied;       // True si no está "Vacio"
-    private String fileName;          // Nombre del archivo dueño (para la visualización)
-    private int processOwnerID;       // ID del proceso que lo ocupa (para la gestión de procesos)
+    private boolean isOccupied;             // True si no está "Vacio"
+    private String fileName;                // Nombre del archivo dueño (para la visualización)
+    private int processOwnerID;             // ID del proceso que lo ocupa (para la gestión de procesos)
     
     // Constructor (Usado al inicializar el Disco)
     public Bloque(int id) {
@@ -55,49 +56,30 @@ public class Bloque {
     // --- Getters y Setters ---
 
     // --- GETTERS ---
-
-    /**
-     * Obtiene el ID (dirección) del bloque en el disco.
-     */
+    
     public int getBlockID() {
         return blockID;
     }
 
-    /**
-     * Verifica si el bloque está ocupado.
-     */
     public boolean isOccupied() {
         return isOccupied;
     }
 
-    /**
-     * Obtiene la dirección (blockID) del siguiente bloque del archivo en la cadena.
-     * Retorna -1 si es el final del archivo.
-     */
     public int getPunteroSiguiente() {
         return punteroSiguiente;
     }
 
-    /**
-     * Obtiene el nombre del archivo que ocupa este bloque.
-     */
     public String getFileName() {
         return fileName;
     }
 
-    /**
-     * Obtiene el ID del proceso que creó/modificó este bloque.
-     */
     public int getProcessOwnerID() {
         return processOwnerID;
     }
 
 
     // --- SETTERS ---
-
-    // Nota: blockID se establece en el constructor y no debe cambiar (por eso no hay setBlockID).
-    // isOccupied, fileName, y processOwnerID son manipulados por los métodos occupy() y liberar().
-
+    
     /**
      * Establece la dirección (blockID) del siguiente bloque en la cadena.
      * CRÍTICO para la Asignación Encadenada.
@@ -107,35 +89,11 @@ public class Bloque {
         this.punteroSiguiente = punteroSiguiente;
     }
 
-    /**
-     * Establece el estado de ocupación. Usado principalmente por occupy() y liberar().
-     * @param occupied true si está ocupado, false si está libre.
-     */
-    public void setOccupied(boolean occupied) {
-        isOccupied = occupied;
-    }
-
-    /**
-     * Establece el nombre del archivo dueño.
-     * @param fileName Nombre del archivo.
-     */
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    /**
-     * Establece el ID del proceso dueño.
-     * @param processOwnerID ID del proceso.
-     */
-    public void setProcessOwnerID(int processOwnerID) {
-        this.processOwnerID = processOwnerID;
-    }
-
-   
-
+    // Nota: Se han eliminado los setters redundantes (setOccupied, setFileName, setProcessOwnerID)
+    // para forzar el uso de los métodos atómicos occupy() y liberar().
+    
     @Override
     public String toString() {
-        // Usamos String.format para alinear y mostrar los datos del bloque
         return String.format("[ID:%02d | Ocupado:%s | Archivo:%s | Puntero:%02d | Proceso:%02d]", 
             blockID, 
             isOccupied ? "SI" : "NO", 
@@ -143,5 +101,4 @@ public class Bloque {
             punteroSiguiente,
             processOwnerID);
     }
-
 }

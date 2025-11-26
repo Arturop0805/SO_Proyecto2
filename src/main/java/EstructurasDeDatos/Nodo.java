@@ -8,40 +8,42 @@ package EstructurasDeDatos;
  *
  * @author Arturo
  */
+
 public class Nodo<T> {
     
     private T dato;
     private Nodo<T> siguiente;
-    private int indice;
-   
-    
-    public Nodo() {
+    private int indice; // Mantener el índice si es requerido por tu diseño
 
+    // Constructor por defecto (usualmente no necesario en Listas Enlazadas)
+    public Nodo() {
         this.dato = null;
         this.siguiente = null;
         this.indice = 0;
-
     }
     
+    // Constructor principal
     public Nodo(T dato, int indice) {
         this.dato = dato;
         this.indice = indice;
         this.siguiente = null;
     }
     
-    
+    // Getters
     public T getDato() {
         return this.dato;
     }
-          
+    
     public Nodo<T> getSiguiente() {
         return this.siguiente;
     }
     
-    public Integer getIndice(){
+    // Sugerencia: Devolver 'int' primitivo
+    public int getIndice() { 
         return this.indice;
     }
     
+    // Setters
     public void setDato(T dato) {
         this.dato = dato;
     }
@@ -53,7 +55,4 @@ public class Nodo<T> {
     public void setIndice(int index){
         this.indice = index;
     }
-    
-    
-    
 }
