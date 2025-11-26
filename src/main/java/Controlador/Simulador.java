@@ -72,8 +72,7 @@ public class Simulador extends JFrame {
       lol.agregarHijo(apk2);
     
       
-     windows.eliminarHijo(system32);
-     windows.ListaHijos.print();
+     
       
        
         
