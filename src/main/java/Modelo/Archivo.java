@@ -4,107 +4,71 @@
  */
 package Modelo;
 
+
+
 import EstructurasDeDatos.ListaEnlazada;
-// import javax.swing.JFrame; // ELIMINADO - Ya no hereda de la GUI
 
 /**
  * Representa un Archivo o Directorio dentro del simulador del Sistema de Archivos.
  */
 public class Archivo {
     
-    private String nombre;
-    private boolean EsDirectorio;
-    private int size; // Tamaño en KB o bloques
-    private int primerBloqueID; // 👈 Nuevo: ID del primer bloque asignado en disco
+    private final String nombre; 
+    private final boolean esDirectorio;
+    private int sizeInBlocks;
+    private int primerBloqueID;
+    private boolean enDisco; 
+    private String propietario = "default"; // Añadido para consistencia con Bloque
     
-    // Lista de hijos (solo si EsDirectorio es true)
-    public ListaEnlazada<Archivo> ListaHijos;
-    // Lista de Bloques (Solo si EsDirectorio es false, para simular contenido)
-    public ListaEnlazada<Bloque> ListaBloquesAsignados; 
-    public Boolean enDisco;
-    
-    
+    private final ListaEnlazada<Archivo> listaHijos;
+
     // --- CONSTRUCTORES ---
-    
-    /**
-     * Constructor principal para crear una nueva entrada (archivo o directorio).
-     * @param nombre Nombre del archivo/directorio.
-     * @param EsDirectorio True si es directorio.
-     * @param size Tamaño inicial o número de bloques a asignar.
-     * @param primerBloqueID ID del primer bloque asignado en el disco. Usar -1 si es directorio o no asignado.
-     */
-    public Archivo (String nombre, Boolean EsDirectorio, int size, int primerBloqueID) {
+    public Archivo (String nombre, boolean esDirectorio, int sizeInBlocks, String propietario) {
         this.nombre = nombre;
-        this.EsDirectorio = EsDirectorio;
-        this.size = size;
-        this.primerBloqueID = primerBloqueID;
+        this.esDirectorio = esDirectorio;
+        this.sizeInBlocks = sizeInBlocks;
+        this.propietario = propietario;
         
-        // Inicialización de listas (siempre se inicializan, pero se usan solo si aplica)
-        this.ListaHijos = new ListaEnlazada<>();
-        this.ListaBloquesAsignados = new ListaEnlazada<>();
+        this.primerBloqueID = -1;
         this.enDisco = false;
+        this.listaHijos = new ListaEnlazada<>();
     }
     
-    public Archivo () {
-        this.nombre = null;
-        this.ListaHijos = new ListaEnlazada<>();
-        this.ListaBloquesAsignados = new ListaEnlazada<>();
-        this.enDisco = false;
-        this.primerBloqueID = -1;
+    // Constructor de Directorio Raíz o Default
+    public Archivo (String nombre, boolean esDirectorio, String propietario) {
+        this(nombre, esDirectorio, 0, propietario);
     }
     
     // --- MÉTODOS DE MANEJO DE ESTRUCTURA Y PROPIEDADES ---
-    
     public void agregarHijo(Archivo dato){
-        if (this.EsDirectorio) { // Usa directamente el booleano
-            this.ListaHijos.Insertar(dato);
+        if (this.esDirectorio) {
+            this.listaHijos.Insertar(dato);
         } else {
-            System.out.println("NO ES DIRECTORIO: No se pueden agregar hijos.");
+            // Error handling
         }
     }
     
     public void eliminarHijo(Archivo dato) {
-        this.ListaHijos.eliminar(dato);
+        this.listaHijos.eliminar(dato);
     }
 
     @Override
     public String toString() {
-        // Útil para la vista del árbol
-        return this.nombre + (this.EsDirectorio ? "/" : "");
+        return this.nombre + (this.esDirectorio ? "/" : "");
     }
 
     // --- GETTERS Y SETTERS ---
-    
-    public String getNombre() {
-        return this.nombre;
-    }
-    // ... (otros getters y setters, incluyendo los nuevos)
-    
-    public int getPrimerBloqueID() {
-        return primerBloqueID;
-    }
-
+    public String getNombre() { return this.nombre; }
+    public boolean esDirectorio() { return this.esDirectorio; }
+    public int getPrimerBloqueID() { return primerBloqueID; }
     public void setPrimerBloqueID(int primerBloqueID) {
         this.primerBloqueID = primerBloqueID;
+        this.enDisco = (primerBloqueID != -1);
     }
-    
-    public Boolean getEsDirectorio(){
-        return this.EsDirectorio;
-    }
-    
-    public int getTamañoBloques() {
-        return this.size;
-    }
-    
-    public void setTamañoBloques(int valor) {
-        this.size = valor;
-    }
-    
-    public Boolean EstaEnDisco(){
-        return this.enDisco;
-    }
-    
-    public void setEnDisco(Boolean valor) {
-        this.enDisco = valor;
-    }
+    public int getSizeInBlocks() { return this.sizeInBlocks; }
+    public void setSizeInBlocks(int sizeInBlocks) { this.sizeInBlocks = sizeInBlocks; }
+    public boolean estaEnDisco() { return this.enDisco; }
+    public void setEnDisco(boolean valor) { this.enDisco = valor; }
+    public String getPropietario() { return propietario; }
+    public ListaEnlazada<Archivo> getListaHijos() { return listaHijos; }
 }

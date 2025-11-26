@@ -1,6 +1,7 @@
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\com\mycompany\so_proyecto2\SO_Proyecto2.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Controlador\AdministradorDirectorios.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Controlador\Simulador.java
+D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Controlador\SimuladorSetup.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\EstructurasDeDatos\Cola.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\EstructurasDeDatos\ListaEnlazada.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\EstructurasDeDatos\Nodo.java
@@ -8,7 +9,6 @@ D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Modelo\Bloque.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Modelo\DirectorioEntrada.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Modelo\Disco.java
-D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Utilidades\SimuladorSetup.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Vista\CrearNodo.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Vista\EliminarNodo.java
 D:\Flia Martinez\Yangel\Universidad\Asignatura\Sistemas Operativos\SO_Proyecto2\src\main\java\Vista\ModificarNodo.java
