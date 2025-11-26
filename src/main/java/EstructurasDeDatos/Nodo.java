@@ -19,9 +19,15 @@ public class Nodo<T> {
 
         this.dato = null;
         this.siguiente = null;
-        this.indice = indice;
+        this.indice = 0;
 
-}
+    }
+    
+    public Nodo(T dato, int indice) {
+        this.dato = dato;
+        this.indice = indice;
+        this.siguiente = null;
+    }
     
     
     public T getDato() {
@@ -47,5 +53,7 @@ public class Nodo<T> {
     public void setIndice(int index){
         this.indice = index;
     }
+    
+    
     
 }

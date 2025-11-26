@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package EstructurasDeDatos;
-import EstructurasDeDatos.Nodo;
+
 /**
  *
  * @author Arturo
@@ -195,17 +195,75 @@ public class ListaEnlazada<T> {
    
    public Nodo<T> buscarPorIndice(int indice) {
        
+       if (indice < 0 || indice >= this.tamaño) {
+        return null; // Índice fuera de límites
+        }
+       
        Nodo auxiliar = this.inicio;
        
        while (auxiliar != null) {
            if (auxiliar.getIndice() == indice){
                return auxiliar;
            }
+           auxiliar = auxiliar.getSiguiente();
        }
        
        
        return null;
    }
+   
+   /**
+ * Diagnóstico: Muestra todos los nodos e índices en la lista.
+ */
+    public void diagnosticoIndices() {
+        System.out.println("\n--- DIAGNÓSTICO DE ÍNDICES DE LA LISTA ENLAZADA ---");
+        Nodo<T> auxiliar = this.inicio;
+        while (auxiliar != null) {
+            // Asumiendo que T es Bloque, obtendremos el ID del bloque
+            String datoStr = auxiliar.getDato() != null ? auxiliar.getDato().toString() : "NULL";
+
+            System.out.println(String.format("Índice de Nodo: %02d | Contenido: %s", 
+                                              auxiliar.getIndice(), datoStr));
+            auxiliar = auxiliar.getSiguiente();
+        }
+        System.out.println("-------------------------------------------------");
+    }
+    
+    public Nodo<T> getInicio() {
+        return this.inicio;
+    }
+
+    /**
+     * Permite establecer el nodo inicial de la lista.
+     * Útil si se necesita reemplazar la cabeza de la lista directamente.
+     * @param inicio El nuevo nodo de inicio.
+     */
+    public void setInicio(Nodo<T> inicio) {
+        this.inicio = inicio;
+    }
+    
+    public T ExtraerInicio() {
+    if (this.EstaVacia()) {
+        return null;
+    }
+    
+    // 1. Guardar el dato a devolver
+    T datoExtraido = this.inicio.getDato();
+    
+    // 2. Mover la cabeza al siguiente nodo
+    this.inicio = this.inicio.getSiguiente();
+    
+    // 3. Reducir tamaño y actualizar índices
+    this.tamaño--;
+    
+    // Si usas el método ActualizarIndices, llámalo aquí:
+    // this.ActualizarIndices();
+    
+    // Si usas la asignación de índice en Insertar (recomendado), no necesitas ActualizarIndices
+    
+    return datoExtraido;
+    }
+    
 }
 
     

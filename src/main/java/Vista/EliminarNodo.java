@@ -7,6 +7,8 @@ package Vista;
 import java.util.Enumeration;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import Controlador.AdministradorDirectorios;
+import Modelo.DirectorioEntrada;
 
 /**
  *
@@ -16,9 +18,10 @@ public class EliminarNodo extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(EliminarNodo.class.getName());
 
+   private AdministradorDirectorios adminFS;
    private DefaultTreeModel modelo;
     
-    public EliminarNodo(DefaultTreeModel modeloArbol) {
+    public EliminarNodo(DefaultTreeModel modeloArbol, AdministradorDirectorios adminFS) {
         initComponents();
         this.setSize(500, 200);
         this.setResizable(false);
@@ -26,6 +29,7 @@ public class EliminarNodo extends javax.swing.JFrame {
 
         ListaNodos.removeAllItems();
         this.modelo = modeloArbol;
+        this.adminFS = adminFS;
         DefaultMutableTreeNode raiz = (DefaultMutableTreeNode) modeloArbol.getRoot();
         this.cargarNodosRecursivo(raiz);
         
@@ -165,10 +169,31 @@ public class EliminarNodo extends javax.swing.JFrame {
     private void DeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteButtonActionPerformed
         
         
-        DefaultMutableTreeNode NodoEliminado = buscarNodoPorNombre(NodeNameField.getText());
-        
-        modelo.removeNodeFromParent(NodoEliminado);
-        this.dispose();
+        String nombreSeleccionado = NodeNameField.getText();
+    
+        // 1. Buscar el nodo Swing (DefaultMutableTreeNode)
+        DefaultMutableTreeNode nodoSwing = buscarNodoPorNombre(nombreSeleccionado);
+
+        if (nodoSwing == null) return; 
+
+        // 2. Obtener el objeto de datos del sistema de archivos (DirectorioEntrada)
+        DirectorioEntrada entradaAEliminar = (DirectorioEntrada) nodoSwing.getUserObject();
+
+        // 3. Obtener el nodo padre (necesario para la eliminación en la ListaHijos)
+        DefaultMutableTreeNode padreSwing = (DefaultMutableTreeNode) nodoSwing.getParent();
+        DirectorioEntrada padreEntrada = (DirectorioEntrada) padreSwing.getUserObject();
+
+        // 4. DELEGAR la eliminación completa al Controlador
+        boolean exito = adminFS.eliminarEntrada(entradaAEliminar, padreEntrada);
+
+        if (exito) {
+            // 5. Si el modelo de datos se eliminó, actualizar la vista
+            modelo.removeNodeFromParent(nodoSwing);
+            this.dispose();
+        } else {
+            // Manejo de errores (ej. permisos, directorio no vacío, etc.)
+            // JOptionPane.showMessageDialog(this, "Error al eliminar el nodo.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
         
     }//GEN-LAST:event_DeleteButtonActionPerformed
 

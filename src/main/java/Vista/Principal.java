@@ -12,6 +12,7 @@ import Vista.CrearNodo;
 import Vista.EliminarNodo;
 import Vista.ModificarNodo;
 
+
 /**
  *
  * @author Arturo
@@ -188,7 +189,7 @@ public class Principal extends javax.swing.JFrame {
         
         DefaultTreeModel modelo = (DefaultTreeModel) Arbol.getModel();
         
-       CrearNodo Interfaz = new CrearNodo(modelo);
+       CrearNodo Interfaz = new CrearNodo(modelo, this.Gestor); // <-- Asegúrate de pasar 'this.Gestor'
        Interfaz.setVisible(true);
        
         
@@ -209,7 +210,7 @@ public class Principal extends javax.swing.JFrame {
     private void BotonEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonEliminarActionPerformed
         
         DefaultTreeModel modelo = (DefaultTreeModel) Arbol.getModel();
-        EliminarNodo interfaz = new EliminarNodo(modelo);
+        EliminarNodo interfaz = new EliminarNodo(modelo, this.Gestor);
         interfaz.setVisible(true);
         
         

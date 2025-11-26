@@ -6,8 +6,11 @@ package Vista;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import Modelo.Archivo;
+import Controlador.Simulador;
+import Modelo.DirectorioEntrada;
 import java.util.Enumeration;
+import javax.swing.JOptionPane;
+import Modelo.Archivo;
 
 /**
  *
@@ -18,24 +21,36 @@ public class CrearNodo extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CrearNodo.class.getName());
 
     private DefaultTreeModel modelo;
+    private Simulador gestorFS;
     
-    public CrearNodo(DefaultTreeModel modeloArbol) {
+    public CrearNodo(DefaultTreeModel modeloArbol, Simulador gestor) {
         initComponents();
         this.setSize(560, 360);
         this.setResizable(false);
         ListaPadres.removeAllItems();
         this.modelo = modeloArbol;
+        this.gestorFS = gestor;
         DefaultMutableTreeNode raiz = (DefaultMutableTreeNode) modeloArbol.getRoot();
         this.cargarNodosRecursivo(raiz);
-        SelectedField.setText(raiz.toString());
+        
+        DirectorioEntrada raizData = (DirectorioEntrada) raiz.getUserObject(); 
+        SelectedField.setText(raizData != null ? raizData.getNombre() : "Raiz");
     }
     
     private void cargarNodosRecursivo(DefaultMutableTreeNode nodo) {
-        
-        if (!nodo.isLeaf()){
-        ListaPadres.addItem(nodo.toString());
+        Object userObject = nodo.getUserObject();
+
+        // Solo procesamos nodos que contienen nuestro modelo de datos real
+        if (userObject instanceof DirectorioEntrada) {
+            DirectorioEntrada entrada = (DirectorioEntrada) userObject;
+
+            // Solo agregamos directorios a la lista de padres disponibles
+            if (entrada.getEsDirectorio()){
+                ListaPadres.addItem(entrada.getNombre());
+            }
         }
-        // Si tiene hijos, recorremos los hijos también
+
+        // Recorrer los hijos
         if (nodo.getChildCount() > 0) {
             for (int i = 0; i < nodo.getChildCount(); i++) {
                 DefaultMutableTreeNode hijo = (DefaultMutableTreeNode) nodo.getChildAt(i);
@@ -260,40 +275,68 @@ public class CrearNodo extends javax.swing.JFrame {
     private void CreateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateButtonActionPerformed
         
         
-        String TamañoTexto = SizeTextField.getText(); // Imagina que esto viene de tu JTextField
-        int TamañoNumero; 
+        String nombre = NameField.getText().trim();
+        String tamañoTexto = SizeTextField.getText().trim();
+        int tamañoNumero = 0;
 
-try {
-    TamañoNumero = Integer.parseInt(TamañoTexto.trim());
-  
-} catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, 
-            "El valor ingresado no es un número válido. Por favor escribe solo dígitos.",
-            "Error de formato",
-            javax.swing.JOptionPane.ERROR_MESSAGE);
+        // 1. Validación de nombre
+        if (nombre.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El nombre no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
-}
-
-        boolean EsDirectorio;
-
-        
-        if (TypeChanger.getText().equals("Archivo")) {
-            EsDirectorio = false;
-        } else {
-            EsDirectorio = true;
         }
-        
-        Archivo archivo = new Archivo(NameField.getText(),EsDirectorio,TamañoNumero);
-        
-        
-        
-        
-        DefaultMutableTreeNode NuevoNodo = new DefaultMutableTreeNode(archivo.getNombre(),EsDirectorio);
-        DefaultMutableTreeNode Padre = buscarNodoPorNombre(SelectedField.getText());
-        int indice = Padre.getChildCount();
-        modelo.insertNodeInto(NuevoNodo, Padre, indice);
-        
-        
+
+        // 2. Validación y obtención de tamaño
+        try {
+            tamañoNumero = Integer.parseInt(tamañoTexto);
+            if (tamañoNumero < 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, 
+            "El tamaño (bloques) debe ser un número entero positivo.",
+            "Error de formato", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // 3. Determinar el tipo y ajustar tamaño
+        boolean esDirectorio = TypeChanger.getText().equals("Directorio");
+
+        if (esDirectorio) {
+            tamañoNumero = 0; // Los directorios no consumen bloques en esta simulación
+        } else if (tamañoNumero == 0) {
+            JOptionPane.showMessageDialog(this, "Los archivos deben tener un tamaño mayor a 0 bloques.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // 4. Buscar el nodo padre en el JTree y obtener su objeto de datos real (DirectorioEntrada)
+        DefaultMutableTreeNode nodoPadreSwing = buscarNodoPorNombre(SelectedField.getText());
+        if (nodoPadreSwing == null) {
+            JOptionPane.showMessageDialog(this, "Error interno: No se encontró el directorio padre seleccionado.", "Error Interno", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        DirectorioEntrada padreFS = (DirectorioEntrada) nodoPadreSwing.getUserObject();
+
+        // 5. DELEGAR la creación al Simulador/AdministradorDirectorios
+        // Usamos gestorFS para acceder a la lógica de negocio
+        DirectorioEntrada nuevaEntradaFS = gestorFS.getAdminFS().crearEntrada(
+            nombre, esDirectorio, tamañoNumero, padreFS, gestorFS.getTipoUsuario()
+        );
+
+        if (nuevaEntradaFS != null) {
+            // 6. Si se creó correctamente, sincronizar el JTree
+            // El nuevo nodo debe contener el objeto DirectorioEntrada real.
+            DefaultMutableTreeNode nuevoNodoSwing = new DefaultMutableTreeNode(nuevaEntradaFS, esDirectorio);
+
+            // El método insertNodeInto actualiza el modelo y el árbol automáticamente
+            modelo.insertNodeInto(nuevoNodoSwing, nodoPadreSwing, nodoPadreSwing.getChildCount());
+            modelo.reload(); 
+
+            JOptionPane.showMessageDialog(this, "Entrada '" + nombre + "' creada con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            this.dispose();
+        } else {
+            // 7. Manejo de errores de negocio (espacio, duplicados, permisos)
+            JOptionPane.showMessageDialog(this, "ERROR: No se pudo crear la entrada. Verifique el nombre, el espacio disponible en disco y los permisos.", "Error de Sistema de Archivos", JOptionPane.ERROR_MESSAGE);
+        }
+
     }//GEN-LAST:event_CreateButtonActionPerformed
 
     private void BackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackButtonActionPerformed
@@ -303,24 +346,23 @@ try {
 
     
     public DefaultMutableTreeNode buscarNodoPorNombre(String nombreBuscado) {
-    // 1. Obtener la raíz del árbol
     DefaultMutableTreeNode raiz = (DefaultMutableTreeNode) modelo.getRoot();
-    
-    // 2. Crear una enumeración para recorrer todo el árbol (Búsqueda en anchura)
     Enumeration e = raiz.breadthFirstEnumeration();
     
-    // 3. Recorrer todos los nodos
     while (e.hasMoreElements()) {
         DefaultMutableTreeNode nodo = (DefaultMutableTreeNode) e.nextElement();
-        
-        // 4. Comparar el texto del nodo con lo que buscamos
-        // Usamos equalsIgnoreCase para que no importen mayúsculas/minúsculas
-        if (nodo.getUserObject().toString().equalsIgnoreCase(nombreBuscado)) {
-            return nodo; // ¡Encontrado!
+        Object userObject = nodo.getUserObject();
+
+        if (userObject instanceof DirectorioEntrada) {
+            DirectorioEntrada entrada = (DirectorioEntrada) userObject;
+            
+            // Compara el nombre del objeto DirectorioEntrada real
+            if (entrada.getNombre().equalsIgnoreCase(nombreBuscado)) {
+                return nodo; 
+            }
         }
     }
-    
-    return null; // No se encontró nada
+    return null;
 }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
